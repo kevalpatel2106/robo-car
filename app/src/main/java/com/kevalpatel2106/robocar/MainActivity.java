@@ -1,6 +1,16 @@
 package com.kevalpatel2106.robocar;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothManager;
+import android.content.Context;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.RemoteException;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -10,6 +20,14 @@ import com.kevalpatel2106.common.Commands;
 import com.kevalpatel2106.robocar.network.CommandResponse;
 import com.kevalpatel2106.robocar.network.RetrofitBuilder;
 
+import org.altbeacon.beacon.Beacon;
+import org.altbeacon.beacon.BeaconConsumer;
+import org.altbeacon.beacon.BeaconManager;
+import org.altbeacon.beacon.RangeNotifier;
+import org.altbeacon.beacon.Region;
+
+import java.util.Collection;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import rx.Observable;
@@ -17,7 +35,8 @@ import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
-public class MainActivity extends AppCompatActivity implements View.OnTouchListener {
+public class MainActivity extends AppCompatActivity implements View.OnTouchListener, BeaconConsumer {
+    private static final int REQ_CODE_LOCATION_PERMISSION = 3654;
 
     @BindView(R.id.btn_forward)
     TextView mBtnForward;
@@ -31,18 +50,58 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
     @BindView(R.id.btn_right)
     TextView mBtnRight;
 
+    @BindView(R.id.tv_distance)
+    TextView mDistanceTv;
+
+    private BeaconManager mBeaconManager;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+
+        enableBluetooth();
 
         //Touch listener
         mBtnForward.setOnTouchListener(this);
         mBtnLeft.setOnTouchListener(this);
         mBtnRight.setOnTouchListener(this);
         mBtnReverse.setOnTouchListener(this);
+
+        //Initiate beacon manager
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            initBeaconRanging();
+        } else {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    REQ_CODE_LOCATION_PERMISSION);
+        }
+    }
+
+    private void initBeaconRanging() {
+        mBeaconManager = BeaconManager.getInstanceForApplication(this);
+        mBeaconManager.bind(this);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == REQ_CODE_LOCATION_PERMISSION) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                initBeaconRanging();
+            }
+        } else {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mBeaconManager != null) mBeaconManager.unbind(this);
     }
 
     private void sendCommandApiRequest(String command) {
@@ -93,5 +152,36 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                 break;
         }
         return true;
+    }
+
+    @Override
+    public void onBeaconServiceConnect() {
+        mBeaconManager.addRangeNotifier(new RangeNotifier() {
+            @Override
+            public void didRangeBeaconsInRegion(final Collection<Beacon> beacons, Region region) {
+                if (beacons.size() > 0) {
+                    runOnUiThread(new Runnable() {
+                        @SuppressLint("DefaultLocale")
+                        @Override
+                        public void run() {
+                            mDistanceTv.setText(String.format("Distance : %.2f meters",
+                                    beacons.iterator().next().getDistance()));
+                        }
+                    });
+                }
+            }
+        });
+
+        try {
+            mBeaconManager.startRangingBeaconsInRegion(new Region("myRangingUniqueId", null, null, null));
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void enableBluetooth() {
+        BluetoothAdapter adapter = ((BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE))
+                .getAdapter();
+        if (!adapter.isEnabled()) adapter.enable();
     }
 }

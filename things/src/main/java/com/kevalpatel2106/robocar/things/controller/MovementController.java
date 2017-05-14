@@ -54,8 +54,7 @@ public class MovementController implements ProximityAlertListener {
                 this,
                 service);
 
-
-        stop();  //Reset
+        reset();
     }
 
     private void leftMotorControl(int movement) throws IOException {
@@ -168,5 +167,9 @@ public class MovementController implements ProximityAlertListener {
         mLeftMotor2.close();
         mRightMotor1.close();
         mRightMotor2.close();
+    }
+
+    public void reset() {
+        stop();
     }
 }
