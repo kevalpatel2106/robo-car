@@ -9,9 +9,9 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:paddingTop="10dp"
         android:layout_height="wrap_content"
-        android:paddingTop="10dp"android:layout_alignParentBottom="true">
+        android:layout_alignParentBottom="true"
+        android:paddingTop="10dp">
 
         <TextView
             android:id="@+id/btn_forward"

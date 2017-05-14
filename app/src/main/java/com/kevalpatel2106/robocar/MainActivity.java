@@ -17,7 +17,7 @@ import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnTouchListener {
 
     @BindView(R.id.btn_forward)
     TextView mBtnForward;
@@ -38,69 +38,11 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        mBtnForward.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        sendCommandApiRequest(Commands.MOVE_FORWARD);
-                        break;
-                    case MotionEvent.ACTION_UP:
-                        sendCommandApiRequest(Commands.STOP);
-                        break;
-                }
-
-                return true;
-            }
-        });
-
-        mBtnLeft.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        sendCommandApiRequest(Commands.TURN_LEFT);
-                        break;
-                    case MotionEvent.ACTION_UP:
-                        sendCommandApiRequest(Commands.STOP);
-                        break;
-                }
-
-                return true;
-            }
-        });
-
-        mBtnRight.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        sendCommandApiRequest(Commands.TURN_RIGHT);
-                        break;
-                    case MotionEvent.ACTION_UP:
-                        sendCommandApiRequest(Commands.STOP);
-                        break;
-                }
-
-                return true;
-            }
-        });
-
-        mBtnReverse.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        sendCommandApiRequest(Commands.MOVE_REVERSE);
-                        break;
-                    case MotionEvent.ACTION_UP:
-                        sendCommandApiRequest(Commands.STOP);
-                        break;
-                }
-
-                return true;
-            }
-        });
+        //Touch listener
+        mBtnForward.setOnTouchListener(this);
+        mBtnLeft.setOnTouchListener(this);
+        mBtnRight.setOnTouchListener(this);
+        mBtnReverse.setOnTouchListener(this);
     }
 
     private void sendCommandApiRequest(String command) {
@@ -112,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
                 .subscribe(new Observer<CommandResponse>() {
                     @Override
                     public void onCompleted() {
+                        //Do nothing
                     }
 
                     @Override
@@ -124,5 +67,31 @@ public class MainActivity extends AppCompatActivity {
 
                     }
                 });
+    }
+
+    @Override
+    public boolean onTouch(View v, MotionEvent event) {
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                switch (v.getId()) {
+                    case R.id.btn_forward:
+                        sendCommandApiRequest(Commands.MOVE_FORWARD);
+                        break;
+                    case R.id.btn_reverse:
+                        sendCommandApiRequest(Commands.MOVE_REVERSE);
+                        break;
+                    case R.id.btn_left:
+                        sendCommandApiRequest(Commands.TURN_LEFT);
+                        break;
+                    case R.id.btn_right:
+                        sendCommandApiRequest(Commands.TURN_RIGHT);
+                        break;
+                }
+                break;
+            case MotionEvent.ACTION_UP:
+                sendCommandApiRequest(Commands.STOP);
+                break;
+        }
+        return true;
     }
 }

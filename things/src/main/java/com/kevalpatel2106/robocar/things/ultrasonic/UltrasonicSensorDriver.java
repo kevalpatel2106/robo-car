@@ -21,9 +21,9 @@ import java.util.concurrent.TimeUnit;
  */
 
 public final class UltrasonicSensorDriver implements AutoCloseable {
-    private static final int INTERVAL_BETWEEN_TRIGGERS = 500;   //Interval between two subsequent pulses
+    private static final int INTERVAL_BETWEEN_TRIGGERS = 70;   //Interval between two subsequent pulses
 
-    private final DistanceListener mListener;   //Listener to get call back when distance changes
+    private final ProximityAlertListener mListener;   //Listener to get call back when distance changes
 
     private Gpio mEchoPin;                  //GPIO for echo
     private Gpio mTrigger;                  //GPIO for trigger
@@ -61,7 +61,8 @@ public final class UltrasonicSensorDriver implements AutoCloseable {
                     double distance = TimeUnit.NANOSECONDS.toMicros(System.nanoTime() - mPulseStartTime) / 58.23; //cm
 
                     //Notify callback
-                    if (mListener != null) mListener.onDistanceChange(distance);
+                    if (mListener != null && distance < 40)
+                        mListener.onProximityAlert();
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -80,9 +81,9 @@ public final class UltrasonicSensorDriver implements AutoCloseable {
      *
      * @param triggerPin Name of the trigger pin
      * @param echoPin    Name of the echo pin
-     * @param listener   {@link DistanceListener} to get callbacks when distance changes.
+     * @param listener   {@link ProximityAlertListener} to get callbacks when distance changes.
      */
-    public UltrasonicSensorDriver(@NonNull String triggerPin, @NonNull String echoPin, DistanceListener listener) {
+    public UltrasonicSensorDriver(@NonNull String triggerPin, @NonNull String echoPin, ProximityAlertListener listener) {
         PeripheralManagerService service = new PeripheralManagerService();
 
         try {
@@ -96,7 +97,7 @@ public final class UltrasonicSensorDriver implements AutoCloseable {
         //Set callback listener.
         mListener = listener;
         if (mListener == null)
-            throw new IllegalArgumentException("DistanceListener cannot be null.");
+            throw new IllegalArgumentException("ProximityAlertListener cannot be null.");
 
         //Start sending pulses
         //We are using different thread for sending pulses to increase time accuracy.

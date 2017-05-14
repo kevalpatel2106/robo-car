@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.kevalpatel2106.robocar.things;
+package com.kevalpatel2106.robocar.things.controller;
 
 import android.os.Build;
 
@@ -83,6 +83,24 @@ public class BoardDefaults {
         switch (getBoardVariant()) {
             case DEVICE_RPI3:
                 return "BCM27";
+            default:
+                throw new IllegalStateException("Unknown Build.DEVICE " + Build.DEVICE);
+        }
+    }
+
+    public static String getGPIOForFrontTrig() {
+        switch (getBoardVariant()) {
+            case DEVICE_RPI3:
+                return "BCM24";
+            default:
+                throw new IllegalStateException("Unknown Build.DEVICE " + Build.DEVICE);
+        }
+    }
+
+    public static String getGPIOForFrontEcho() {
+        switch (getBoardVariant()) {
+            case DEVICE_RPI3:
+                return "BCM23";
             default:
                 throw new IllegalStateException("Unknown Build.DEVICE " + Build.DEVICE);
         }

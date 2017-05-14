@@ -1,4 +1,4 @@
-package com.kevalpatel2106.robocar.things;
+package com.kevalpatel2106.robocar.things.controller;
 
 import com.google.android.things.pio.Gpio;
 import com.google.android.things.pio.PeripheralManagerService;
@@ -15,6 +15,9 @@ public class MovementController {
     private static final int MOVEMENT_FORWARD = 0;
     private static final int MOVEMENT_STOP = 1;
     private static final int MOVEMENT_REVERSE = 2;
+
+
+    private boolean isLocked = false;
 
     private Gpio mRightMotor1;
     private Gpio mRightMotor2;
@@ -39,6 +42,8 @@ public class MovementController {
             e.printStackTrace();
             throw new ExceptionInInitializerError("Cannot initialize GPIO.");
         }
+
+        stop();  //Reset
     }
 
     private void leftMotorControl(int movement) throws IOException {
@@ -76,6 +81,7 @@ public class MovementController {
     }
 
     public void turnLeft() {
+        if (isLocked) return;
         try {
             leftMotorControl(MOVEMENT_REVERSE);
             rightMotorControl(MOVEMENT_FORWARD);
@@ -85,6 +91,7 @@ public class MovementController {
     }
 
     public void turnRight() {
+        if (isLocked) return;
         try {
             leftMotorControl(MOVEMENT_FORWARD);
             rightMotorControl(MOVEMENT_REVERSE);
@@ -94,6 +101,7 @@ public class MovementController {
     }
 
     public void moveForward() {
+        if (isLocked) return;
         try {
             leftMotorControl(MOVEMENT_FORWARD);
             rightMotorControl(MOVEMENT_FORWARD);
@@ -104,13 +112,18 @@ public class MovementController {
     }
 
     public void moveReverse() {
+        if (isLocked) return;
+        forceReverse();
+
+    }
+
+    public void forceReverse() {
         try {
             leftMotorControl(MOVEMENT_REVERSE);
             rightMotorControl(MOVEMENT_REVERSE);
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
     public void stop() {
@@ -120,5 +133,13 @@ public class MovementController {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public boolean isLocked() {
+        return isLocked;
+    }
+
+    public void setLocked(boolean locked) {
+        isLocked = locked;
     }
 }

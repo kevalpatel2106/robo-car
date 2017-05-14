@@ -3,7 +3,7 @@ package com.kevalpatel2106.robocar.things.webserver;
 import android.util.Log;
 
 import com.kevalpatel2106.common.Commands;
-import com.kevalpatel2106.robocar.things.MovementController;
+import com.kevalpatel2106.robocar.things.controller.MovementController;
 
 import java.io.IOException;
 import java.util.Map;
@@ -17,23 +17,27 @@ import fi.iki.elonen.NanoHTTPD;
  */
 
 public class WebServer extends NanoHTTPD {
+    private static final String TAG = WebServer.class.getSimpleName();
+
     private final MovementController mMovementController;
 
     public WebServer(MovementController movementController) throws IOException {
         super(8080);
         mMovementController = movementController;
         start(NanoHTTPD.SOCKET_READ_TIMEOUT, false);
-        Log.d("Server", "Start");
+
+        Log.d(TAG, "WebServer: Starting server.");
     }
 
     @Override
     public Response serve(IHTTPSession session) {
         if (session.getMethod() == Method.GET) {
-            Log.d("HTTP request: ", session.getMethod() + " " + session.getUri());
+
             switch (session.getUri()) {
                 case "/command":
                     Map<String, String> params = session.getParms();
-                    Log.d("WebServer", "serve: " + params.get("movement"));
+
+                    Log.d(TAG, "serve: " + params.get("movement"));
 
                     switch (params.get("movement")) {
                         case Commands.MOVE_FORWARD:
