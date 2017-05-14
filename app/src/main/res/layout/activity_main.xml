@@ -4,11 +4,64 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:padding="16dp"
     tools:context="com.kevalpatel2106.robocar.MainActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:paddingTop="10dp"
         android:layout_height="wrap_content"
-        android:text="Hello World!"/>
+        android:paddingTop="10dp"android:layout_alignParentBottom="true">
+
+        <TextView
+            android:id="@+id/btn_forward"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/bg_button"
+            android:minWidth="100dp"
+            android:padding="15dp"
+            android:text="Forward"
+            android:textAlignment="center"/>
+
+        <TextView
+            android:id="@+id/btn_right"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/btn_forward"
+            android:layout_centerHorizontal="true"
+            android:layout_toRightOf="@id/btn_forward"
+            android:background="@drawable/bg_button"
+            android:minWidth="100dp"
+            android:padding="15dp"
+            android:text="Right"
+            android:textAlignment="center"/>
+
+        <TextView
+            android:id="@+id/btn_left"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/btn_forward"
+            android:layout_centerHorizontal="true"
+            android:layout_toLeftOf="@id/btn_forward"
+            android:background="@drawable/bg_button"
+            android:minWidth="100dp"
+            android:padding="15dp"
+            android:text="Left"
+            android:textAlignment="center"/>
+
+        <TextView
+            android:id="@+id/btn_reverse"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/btn_left"
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/bg_button"
+            android:minWidth="100dp"
+            android:padding="15dp"
+            android:text="Reverse"
+            android:textAlignment="center"/>
+
+    </RelativeLayout>
 
 </RelativeLayout>
