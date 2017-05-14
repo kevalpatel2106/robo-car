@@ -58,10 +58,8 @@ public final class UltrasonicSensorDriver implements AutoCloseable {
                 } else {
                     //Calculate distance.
                     //From data-sheet (https://cdn.sparkfun.com/datasheets/Sensors/Proximity/HCSR04.pdf)
-                    double distance = TimeUnit.NANOSECONDS.toMicros(System.nanoTime() - mPulseStartTime) / 58.23; //cm
-
                     //Notify callback
-                    if (mListener != null && distance < 40)
+                    if (TimeUnit.NANOSECONDS.toMicros(System.nanoTime() - mPulseStartTime) / 58.23 < 40)
                         mListener.onProximityAlert();
                 }
             } catch (IOException e) {
@@ -83,9 +81,10 @@ public final class UltrasonicSensorDriver implements AutoCloseable {
      * @param echoPin    Name of the echo pin
      * @param listener   {@link ProximityAlertListener} to get callbacks when distance changes.
      */
-    public UltrasonicSensorDriver(@NonNull String triggerPin, @NonNull String echoPin, ProximityAlertListener listener) {
-        PeripheralManagerService service = new PeripheralManagerService();
-
+    public UltrasonicSensorDriver(@NonNull String triggerPin,
+                                  @NonNull String echoPin,
+                                  @NonNull ProximityAlertListener listener,
+                                  @NonNull PeripheralManagerService service) {
         try {
             setTriggerPin(service, triggerPin);
             setEchoPin(service, echoPin);
@@ -96,6 +95,7 @@ public final class UltrasonicSensorDriver implements AutoCloseable {
 
         //Set callback listener.
         mListener = listener;
+        //noinspection ConstantConditions
         if (mListener == null)
             throw new IllegalArgumentException("ProximityAlertListener cannot be null.");
 
@@ -155,13 +155,9 @@ public final class UltrasonicSensorDriver implements AutoCloseable {
     }
 
     @Override
-    public void close() throws Exception {
-        try {
-            mEchoPin.unregisterGpioCallback(mEchoCallback);
-            mEchoPin.close();
-            mTrigger.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public void close() throws IOException {
+        mEchoPin.unregisterGpioCallback(mEchoCallback);
+        mEchoPin.close();
+        mTrigger.close();
     }
 }

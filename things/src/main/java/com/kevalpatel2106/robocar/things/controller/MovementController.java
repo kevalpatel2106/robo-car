@@ -1,7 +1,11 @@
 package com.kevalpatel2106.robocar.things.controller;
 
+import android.os.Handler;
+
 import com.google.android.things.pio.Gpio;
 import com.google.android.things.pio.PeripheralManagerService;
+import com.kevalpatel2106.robocar.things.ultrasonic.ProximityAlertListener;
+import com.kevalpatel2106.robocar.things.ultrasonic.UltrasonicSensorDriver;
 
 import java.io.IOException;
 
@@ -11,11 +15,12 @@ import java.io.IOException;
  * @author 'https://github.com/kevalpatel2106'
  */
 
-public class MovementController {
+public class MovementController implements ProximityAlertListener {
     private static final int MOVEMENT_FORWARD = 0;
     private static final int MOVEMENT_STOP = 1;
     private static final int MOVEMENT_REVERSE = 2;
 
+    private final UltrasonicSensorDriver mUltrasonicSensor;
 
     private boolean isLocked = false;
 
@@ -42,6 +47,13 @@ public class MovementController {
             e.printStackTrace();
             throw new ExceptionInInitializerError("Cannot initialize GPIO.");
         }
+
+        //Start ultrasonic sensors
+        mUltrasonicSensor = new UltrasonicSensorDriver(BoardDefaults.getGPIOForFrontTrig(),
+                BoardDefaults.getGPIOForFrontEcho(),
+                this,
+                service);
+
 
         stop();  //Reset
     }
@@ -117,7 +129,7 @@ public class MovementController {
 
     }
 
-    public void forceReverse() {
+    private void forceReverse() {
         try {
             leftMotorControl(MOVEMENT_REVERSE);
             rightMotorControl(MOVEMENT_REVERSE);
@@ -135,11 +147,26 @@ public class MovementController {
         }
     }
 
-    public boolean isLocked() {
-        return isLocked;
+    @Override
+    public void onProximityAlert() {
+        isLocked = true;
+
+        forceReverse();
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                stop();
+                isLocked = false;
+            }
+        }, 400);
     }
 
-    public void setLocked(boolean locked) {
-        isLocked = locked;
+    public void close() throws Exception {
+        mUltrasonicSensor.close();
+        mLeftMotor1.close();
+        mLeftMotor2.close();
+        mRightMotor1.close();
+        mRightMotor2.close();
     }
 }
