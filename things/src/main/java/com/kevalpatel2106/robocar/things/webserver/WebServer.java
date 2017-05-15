@@ -19,7 +19,7 @@ import fi.iki.elonen.NanoHTTPD;
  * @author 'https://github.com/kevalpatel2106'
  */
 
-public class WebServer extends NanoHTTPD {
+public final class WebServer extends NanoHTTPD {
     private static final String TAG = WebServer.class.getSimpleName();
 
     @NonNull

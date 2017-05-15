@@ -8,7 +8,6 @@ import android.util.Log;
 
 import org.altbeacon.beacon.Beacon;
 import org.altbeacon.beacon.BeaconParser;
-import org.altbeacon.beacon.BeaconTransmitter;
 
 import java.util.Collections;
 
@@ -18,13 +17,13 @@ import java.util.Collections;
  * @author 'https://github.com/kevalpatel2106'
  */
 
-public class BeaconCreator {
+public final class BeaconTransmitter {
 
-    private static final String TAG = BeaconCreator.class.getSimpleName();
-    private static BeaconTransmitter mBeaconTransmitter;
+    private static final String TAG = BeaconTransmitter.class.getSimpleName();
+    private static org.altbeacon.beacon.BeaconTransmitter mBeaconTransmitter;
     private final Context mContext;
 
-    public BeaconCreator(Context context) {
+    public BeaconTransmitter(Context context) {
         mContext = context;
     }
 
@@ -34,7 +33,7 @@ public class BeaconCreator {
             // Sets up to transmit as an AltBeacon-style beacon.  If you wish to transmit as a different
             // type of beacon, simply provide a different parser expression.  To find other parser expressions,
             // for other beacon types, do a Google search for "setBeaconLayout" including the quotes
-            mBeaconTransmitter = new BeaconTransmitter(mContext,
+            mBeaconTransmitter = new org.altbeacon.beacon.BeaconTransmitter(mContext,
                     new BeaconParser().setBeaconLayout("m:2-3=beac,i:4-19,i:20-21,i:22-23,p:24-24,d:25-25"));
 
             // Transmit a beacon with Identifiers 2F234454-CF6D-4A0F-ADF2-F4911BA9FFA6 1 2

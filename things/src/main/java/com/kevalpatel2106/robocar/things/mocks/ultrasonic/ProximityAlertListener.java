@@ -1,9 +1,9 @@
-package com.kevalpatel2106.robocar.things.ultrasonic;
+package com.kevalpatel2106.robocar.things.mocks.ultrasonic;
 
 /**
  * Callback listener to get notified when proximity alert triggers.
  */
 
 public interface ProximityAlertListener {
-    void onProximityAlert();
+    void onProximityDistanceChange(double distance);
 }

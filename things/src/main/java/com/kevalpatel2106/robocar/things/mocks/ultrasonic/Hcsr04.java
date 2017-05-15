@@ -1,4 +1,4 @@
-package com.kevalpatel2106.robocar.things.ultrasonic;
+package com.kevalpatel2106.robocar.things.mocks.ultrasonic;
 
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -20,8 +20,9 @@ import java.util.concurrent.TimeUnit;
  * @author Keval {https://github.com/kevalpatel2106}
  */
 
-public final class UltrasonicSensorDriver implements AutoCloseable {
-    private static final int INTERVAL_BETWEEN_TRIGGERS = 70;   //Interval between two subsequent pulses
+public final class Hcsr04 implements AutoCloseable {
+    private static final int INTERVAL_BETWEEN_TRIGGERS = 65;    //Interval between two subsequent pulses
+    private static final int TRIG_DURATION_IN_NANO = 10000;     //Trigger pulse duration
 
     private final ProximityAlertListener mListener;   //Listener to get call back when distance changes
 
@@ -59,8 +60,8 @@ public final class UltrasonicSensorDriver implements AutoCloseable {
                     //Calculate distance.
                     //From data-sheet (https://cdn.sparkfun.com/datasheets/Sensors/Proximity/HCSR04.pdf)
                     //Notify callback
-                    if (TimeUnit.NANOSECONDS.toMicros(System.nanoTime() - mPulseStartTime) / 58.23 < 40)
-                        mListener.onProximityAlert();
+                    double distance = TimeUnit.NANOSECONDS.toMicros(System.nanoTime() - mPulseStartTime) / 58.23;
+                    mListener.onProximityDistanceChange(distance);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -81,10 +82,10 @@ public final class UltrasonicSensorDriver implements AutoCloseable {
      * @param echoPin    Name of the echo pin
      * @param listener   {@link ProximityAlertListener} to get callbacks when distance changes.
      */
-    public UltrasonicSensorDriver(@NonNull String triggerPin,
-                                  @NonNull String echoPin,
-                                  @NonNull ProximityAlertListener listener,
-                                  @NonNull PeripheralManagerService service) {
+    public Hcsr04(@NonNull String triggerPin,
+                  @NonNull String echoPin,
+                  @NonNull ProximityAlertListener listener,
+                  @NonNull PeripheralManagerService service) {
         try {
             setTriggerPin(service, triggerPin);
             setEchoPin(service, echoPin);
@@ -148,7 +149,7 @@ public final class UltrasonicSensorDriver implements AutoCloseable {
 
         //Set trigger pin for 10 micro seconds.
         mTrigger.setValue(true);
-        Thread.sleep(0, 10000);
+        Thread.sleep(0, TRIG_DURATION_IN_NANO);
 
         // Reset the trigger after 10 micro seconds.
         mTrigger.setValue(false);

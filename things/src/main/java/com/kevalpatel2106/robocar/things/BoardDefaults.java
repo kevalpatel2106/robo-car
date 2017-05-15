@@ -23,7 +23,7 @@ import com.google.android.things.pio.PeripheralManagerService;
 import java.util.List;
 
 @SuppressWarnings("WeakerAccess")
-public class BoardDefaults {
+public final class BoardDefaults {
     private static final String DEVICE_EDISON_ARDUINO = "edison_arduino";
     private static final String DEVICE_EDISON = "edison";
     private static final String DEVICE_JOULE = "joule";
