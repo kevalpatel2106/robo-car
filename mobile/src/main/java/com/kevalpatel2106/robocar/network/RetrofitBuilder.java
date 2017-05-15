@@ -16,6 +16,8 @@
 
 package com.kevalpatel2106.robocar.network;
 
+import com.kevalpatel2106.common.EndPoints;
+
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
@@ -47,7 +49,7 @@ public class RetrofitBuilder {
         final Retrofit retrofit = new Retrofit.Builder()
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
-                .baseUrl(APIService.BASE_URL)
+                .baseUrl(EndPoints.BASE_URL)
                 .client(client)
                 .build();
 

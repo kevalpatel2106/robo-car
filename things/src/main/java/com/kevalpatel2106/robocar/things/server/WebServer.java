@@ -20,6 +20,7 @@ import android.content.res.AssetManager;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.kevalpatel2106.common.EndPoints;
 import com.kevalpatel2106.common.RoboCommands;
 import com.kevalpatel2106.robocar.things.chassis.MovementController;
 
@@ -74,12 +75,12 @@ public final class WebServer extends NanoHTTPD {
 
             try {
                 switch (session.getUri()) {
-                    case "/command":    //Command to control the robot
+                    case EndPoints.ENDPOINT_COMMAND:    //Command to control the robot
                         Map<String, String> params = session.getParms();
 
-                        Log.d(TAG, "serve: New command = " + params.get("cmdname"));
+                        Log.d(TAG, "serve: New command = " + params.get(EndPoints.PARAM_COMMAND));
 
-                        switch (params.get("movement")) {
+                        switch (params.get(EndPoints.PARAM_COMMAND)) {
                             case RoboCommands.MOVE_FORWARD:
                                 mMovementController.moveForward();
                                 return newFixedLengthResponse("{\"s\":\"Ok\"}");

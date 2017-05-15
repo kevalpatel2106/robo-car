@@ -14,21 +14,25 @@
  *  limitations under the License.
  */
 
-buildscript {
-    repositories {
-        jcenter()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.2'
-    }
-}
+package com.kevalpatel2106.common;
 
-allprojects {
-    repositories {
-        jcenter()
-    }
-}
+/**
+ * Created by Keval on 15-May-17.
+ * List of end points.
+ *
+ * @author Keval {https://github.com/kevalpatel2106}
+ */
 
-task clean(type: Delete) {
-    delete rootProject.buildDir
+public class EndPoints {
+    /**
+     * Base url.
+     */
+    public static final String BASE_URL = "http://192.168.0.106:8080/";
+
+    //List of endpoint.
+    public static final String ENDPOINT_ROOT = "";
+    public static final String ENDPOINT_COMMAND = "command";
+
+    //Params name.
+    public static final String PARAM_COMMAND = "cmd";
 }

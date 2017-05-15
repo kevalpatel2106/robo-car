@@ -16,6 +16,8 @@
 
 package com.kevalpatel2106.robocar.network;
 
+import com.kevalpatel2106.common.EndPoints;
+
 import retrofit2.http.GET;
 import retrofit2.http.Query;
 import rx.Observable;
@@ -27,8 +29,6 @@ import rx.Observable;
  */
 
 public interface APIService {
-    String BASE_URL = "http://192.168.0.106:8080/";
-
-    @GET("/command")
-    Observable<CommandResponse> sendCommand(@Query("cmdname") String command);
+    @GET(EndPoints.ENDPOINT_COMMAND)
+    Observable<CommandResponse> sendCommand(@Query(EndPoints.PARAM_COMMAND) String command);
 }
