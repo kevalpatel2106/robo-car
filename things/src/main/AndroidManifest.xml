@@ -24,7 +24,9 @@
     <uses-permission android:name="android.permission.BLUETOOTH"/>
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
 
-    <application tools:ignore="AllowBackup,GoogleAppIndexingWarning,MissingApplicationIcon">
+    <application
+        android:theme="@style/Theme.AppCompat.Light.DarkActionBar"
+        tools:ignore="AllowBackup,GoogleAppIndexingWarning,MissingApplicationIcon">
 
         <uses-library android:name="com.google.android.things"/>
 

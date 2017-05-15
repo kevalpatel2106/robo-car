@@ -52,10 +52,11 @@ final class Chassis extends ChassisMock {
     Chassis(@NonNull Context context,
             @NonNull PeripheralManagerService service,
             @NonNull ObstacleAlertListener listener) {
-        super();
         mContext = context;
         mService = service;
         mListener = listener;
+
+        build();
     }
 
     @Override

@@ -35,8 +35,8 @@ import fi.iki.elonen.NanoHTTPD;
  * This is a small web server running on your Raspberry PI. Connect to the local ip of the
  * raspberry Pi with port 8080 and issue the commands.
  *
- * @see 'https://github.com/NanoHttpd/nanohttpd'
  * @author Keval {https://github.com/kevalpatel2106}
+ * @see 'https://github.com/NanoHttpd/nanohttpd'
  */
 
 public final class WebServer extends NanoHTTPD {
@@ -75,7 +75,7 @@ public final class WebServer extends NanoHTTPD {
 
             try {
                 switch (session.getUri()) {
-                    case EndPoints.ENDPOINT_COMMAND:    //Command to control the robot
+                    case "/" + EndPoints.ENDPOINT_COMMAND:    //Command to control the robot
                         Map<String, String> params = session.getParms();
 
                         Log.d(TAG, "serve: New command = " + params.get(EndPoints.PARAM_COMMAND));

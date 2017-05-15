@@ -57,18 +57,13 @@ abstract class ChassisMock implements AutoCloseable {
      * Public constructor.
      */
     ChassisMock() {
-        //Build the chassis
-        build();
-
-        //Initialize the components.
-        init();
     }
 
     /**
      * Mount the component and build the chassis.
      */
     @SuppressWarnings("ConstantConditions")
-    private void build() {
+    protected void build() {
         mFrontRadar = mountFrontRadar();
         mBeacon = mountBeacon();
 
@@ -79,6 +74,9 @@ abstract class ChassisMock implements AutoCloseable {
         mRightMotor = mountRightMotor();
         if (mRightMotor == null)
             throw new IllegalArgumentException("Cannot set right motor to null. Are you building car?");
+
+        //Initialize the components.
+        init();
     }
 
     /**
