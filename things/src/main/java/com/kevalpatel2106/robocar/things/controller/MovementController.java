@@ -1,13 +1,17 @@
 package com.kevalpatel2106.robocar.things.controller;
 
 import android.os.Handler;
+import android.support.annotation.IntDef;
 
 import com.google.android.things.pio.Gpio;
 import com.google.android.things.pio.PeripheralManagerService;
+import com.kevalpatel2106.robocar.things.BoardDefaults;
 import com.kevalpatel2106.robocar.things.ultrasonic.ProximityAlertListener;
 import com.kevalpatel2106.robocar.things.ultrasonic.UltrasonicSensorDriver;
 
 import java.io.IOException;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
 /**
  * Created by Keval Patel on 14/05/17.
@@ -57,7 +61,7 @@ public class MovementController implements ProximityAlertListener {
         reset();
     }
 
-    private void leftMotorControl(int movement) throws IOException {
+    private void leftMotorControl(@Movement int movement) throws IOException {
         switch (movement) {
             case MOVEMENT_FORWARD:
                 mLeftMotor1.setValue(true);
@@ -74,7 +78,7 @@ public class MovementController implements ProximityAlertListener {
         }
     }
 
-    private void rightMotorControl(int movement) throws IOException {
+    private void rightMotorControl(@Movement int movement) throws IOException {
         switch (movement) {
             case MOVEMENT_FORWARD:
                 mRightMotor1.setValue(true);
@@ -171,5 +175,10 @@ public class MovementController implements ProximityAlertListener {
 
     public void reset() {
         stop();
+    }
+
+    @Retention(RetentionPolicy.SOURCE)
+    @IntDef({MOVEMENT_FORWARD, MOVEMENT_REVERSE, MOVEMENT_STOP})
+    @interface Movement {
     }
 }

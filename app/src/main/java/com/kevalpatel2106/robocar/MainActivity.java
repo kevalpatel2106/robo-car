@@ -16,7 +16,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
 
-import com.kevalpatel2106.common.Commands;
+import com.kevalpatel2106.common.RoboCommands;
 import com.kevalpatel2106.robocar.network.CommandResponse;
 import com.kevalpatel2106.robocar.network.RetrofitBuilder;
 
@@ -89,12 +89,13 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == REQ_CODE_LOCATION_PERMISSION) {
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                initBeaconRanging();
-            }
-        } else {
-            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case REQ_CODE_LOCATION_PERMISSION:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) initBeaconRanging();
+                break;
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+                break;
         }
     }
 
@@ -104,7 +105,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         if (mBeaconManager != null) mBeaconManager.unbind(this);
     }
 
-    private void sendCommandApiRequest(String command) {
+    private void sendCommandApiRequest(@RoboCommands.Command String command) {
         final Observable<CommandResponse> observable = RetrofitBuilder
                 .getApiService()
                 .sendCommand(command);
@@ -134,21 +135,21 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
             case MotionEvent.ACTION_DOWN:
                 switch (v.getId()) {
                     case R.id.btn_forward:
-                        sendCommandApiRequest(Commands.MOVE_FORWARD);
+                        sendCommandApiRequest(RoboCommands.MOVE_FORWARD);
                         break;
                     case R.id.btn_reverse:
-                        sendCommandApiRequest(Commands.MOVE_REVERSE);
+                        sendCommandApiRequest(RoboCommands.MOVE_REVERSE);
                         break;
                     case R.id.btn_left:
-                        sendCommandApiRequest(Commands.TURN_LEFT);
+                        sendCommandApiRequest(RoboCommands.TURN_LEFT);
                         break;
                     case R.id.btn_right:
-                        sendCommandApiRequest(Commands.TURN_RIGHT);
+                        sendCommandApiRequest(RoboCommands.TURN_RIGHT);
                         break;
                 }
                 break;
             case MotionEvent.ACTION_UP:
-                sendCommandApiRequest(Commands.STOP);
+                sendCommandApiRequest(RoboCommands.STOP);
                 break;
         }
         return true;

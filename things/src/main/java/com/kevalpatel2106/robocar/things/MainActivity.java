@@ -28,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
             mBeaconCreator.initBeaconTransmission();
 
             //Start the web server
-            new WebServer(mMovementController);
+            new WebServer(mMovementController, getAssets());
         } catch (IOException e) {
             e.printStackTrace();
         }

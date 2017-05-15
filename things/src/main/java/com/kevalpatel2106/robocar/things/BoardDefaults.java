@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.kevalpatel2106.robocar.things.controller;
+package com.kevalpatel2106.robocar.things;
 
 import android.os.Build;
 
