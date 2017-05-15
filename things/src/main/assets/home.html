@@ -7,101 +7,34 @@
           href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
-    <script>
-        document.onkeydown = checkKey;
-        document.onkeyup = stopRobot;
-
-        var baseUrl = "http://192.168.0.106:8080/command?cmdname="
-        var isCommandSent = false
-
-        var HttpClient = function() {
-            this.get = function(aUrl, aCallback) {
-                var anHttpRequest = new XMLHttpRequest();
-                anHttpRequest.onreadystatechange = function() {
-                    if (anHttpRequest.readyState == 4 && anHttpRequest.status == 200)
-                        aCallback(anHttpRequest.responseText);
-                }
-
-                anHttpRequest.open( "GET", aUrl, true );
-                anHttpRequest.send( null );
-            }
-        }
-
-        function checkKey(e) {
-            if (!isCommandSent){
-                isCommandSent = true
-
-                e = e || window.event;
-                if (e.keyCode == '38') {
-                    // up arrow
-                    var commandStr = baseUrl.concat("forward");
-                    httpGet(commandStr)
-                } else if (e.keyCode == '40') {
-                    // down arrow
-                    var commandStr = baseUrl.concat("reverse");
-                    httpGet(commandStr)
-                } else if (e.keyCode == '37') {
-                    // left arrow
-                    var commandStr = baseUrl.concat("left");
-                    httpGet(commandStr)
-                } else if (e.keyCode == '39') {
-                    // right arrow
-                    var commandStr = baseUrl.concat("right");
-                    httpGet(commandStr)
-                }
-            }
-        }
-
-        function stopRobot(e) {
-            var commandStr = baseUrl.concat("stop");
-            httpGet(commandStr)
-            isCommandSent = false
-        }
-
-        function httpGet(theUrl) {
-            console.log(theUrl);
-            var client = new HttpClient();
-            client.get(theUrl, function(response) {
-                console.log(response);
-            });
-        }
-
-
-    </script>
-    <style>
-        .col-centered{
-            float: none;
-            margin: 0 auto;
-        }
-
-
-    </style>
+    <script src="script.js"></script>
 </head>
 <body>
 <H1>Robocar Controller</H1>
-
-<!-- Button -->
-<div class="row">
-    <div class="col-md-8">
-        <button id="forwardBtn" name="forwardBtn" class="btn btn-primary"> Forward
-        </button>
+<center>
+    <!-- Button -->
+    <div class="row">
+        <div class="col-md-8">
+            <button id="forwardBtn" name="forwardBtn" class="btn btn-primary"> Forward
+            </button>
+        </div>
     </div>
-</div>
 
-<!-- Button (Double) -->
-<div class="row">
-    <div class="col-md-8">
-        <button id="rightBtn col-md-4" name="rightBtn" class="btn btn-success"> Right</button>
-        <button id="leftBtn col-md-4" name="leftBtn" class="btn btn-danger"> Left</button>
+    <!-- Button (Double) -->
+    <div class="row">
+        <div class="col-md-8">
+            <button id="rightBtn col-md-4" name="rightBtn" class="btn btn-success"> Right</button>
+            <button id="leftBtn col-md-4" name="leftBtn" class="btn btn-danger"> Left</button>
+        </div>
     </div>
-</div>
 
-<!-- Button -->
-<div class="row">
-    <div class="col-md-8">
-        <button id="reverseBtn" name="reverseBtn" class="btn btn-primary"> Reverse
-        </button>
+    <!-- Button -->
+    <div class="row">
+        <div class="col-md-8">
+            <button id="reverseBtn" name="reverseBtn" class="btn btn-primary"> Reverse
+            </button>
+        </div>
     </div>
-</div>
+</center>
 </body>
 </html>
