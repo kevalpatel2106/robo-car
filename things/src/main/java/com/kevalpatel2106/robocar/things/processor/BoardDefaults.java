@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.kevalpatel2106.robocar.things;
+package com.kevalpatel2106.robocar.things.processor;
 
 import android.os.Build;
 
@@ -22,6 +22,11 @@ import com.google.android.things.pio.PeripheralManagerService;
 
 import java.util.List;
 
+/**
+ * Class to map different GPIO pins to hardware components.
+ *
+ * @author Keval {https://github.com/kevalpatel2106}
+ */
 @SuppressWarnings("WeakerAccess")
 public final class BoardDefaults {
     private static final String DEVICE_EDISON_ARDUINO = "edison_arduino";
@@ -33,7 +38,7 @@ public final class BoardDefaults {
     private static String sBoardVariant = "";
 
     /**
-     * Return the GPIO pin for the trigger pin in HC-SR04 sensor.
+     * Return the GPIO pin for control 1 of the right side motor.
      * <p>
      * See: https://pinout.xyz/pinout/
      */
@@ -42,12 +47,12 @@ public final class BoardDefaults {
             case DEVICE_RPI3:
                 return "BCM6";
             default:
-                throw new IllegalStateException("Unknown Build.DEVICE " + Build.DEVICE);
+                throw new IllegalStateException("Unknown board " + Build.DEVICE);
         }
     }
 
     /**
-     * Return the GPIO pin for the echo pin in HC-SR04 sensor.
+     * Return the GPIO pin for control 2 of the right side motor.
      * <p>
      * See: https://pinout.xyz/pinout/
      */
@@ -56,12 +61,12 @@ public final class BoardDefaults {
             case DEVICE_RPI3:
                 return "BCM5";
             default:
-                throw new IllegalStateException("Unknown Build.DEVICE " + Build.DEVICE);
+                throw new IllegalStateException("Unknown board " + Build.DEVICE);
         }
     }
 
     /**
-     * Return the GPIO pin for the trigger pin in HC-SR04 sensor.
+     * Return the GPIO pin for control 1 of the left side motor.
      * <p>
      * See: https://pinout.xyz/pinout/
      */
@@ -70,12 +75,12 @@ public final class BoardDefaults {
             case DEVICE_RPI3:
                 return "BCM22";
             default:
-                throw new IllegalStateException("Unknown Build.DEVICE " + Build.DEVICE);
+                throw new IllegalStateException("Unknown board " + Build.DEVICE);
         }
     }
 
     /**
-     * Return the GPIO pin for the echo pin in HC-SR04 sensor.
+     * Return the GPIO pin for control 2 of the left side motor.
      * <p>
      * See: https://pinout.xyz/pinout/
      */
@@ -84,25 +89,35 @@ public final class BoardDefaults {
             case DEVICE_RPI3:
                 return "BCM27";
             default:
-                throw new IllegalStateException("Unknown Build.DEVICE " + Build.DEVICE);
+                throw new IllegalStateException("Unknown board " + Build.DEVICE);
         }
     }
 
-    public static String getGPIOForFrontTrig() {
+    /**
+     * Get the GPIO for the front radar trigger pin.
+     * <p>
+     * See: https://pinout.xyz/pinout/
+     */
+    public static String getGPIOForFrontRadarTrig() {
         switch (getBoardVariant()) {
             case DEVICE_RPI3:
                 return "BCM24";
             default:
-                throw new IllegalStateException("Unknown Build.DEVICE " + Build.DEVICE);
+                throw new IllegalStateException("Unknown board " + Build.DEVICE);
         }
     }
 
+    /**
+     * Get the GPIO for the front radar echo pin.
+     * <p>
+     * See: https://pinout.xyz/pinout/
+     */
     public static String getGPIOForFrontEcho() {
         switch (getBoardVariant()) {
             case DEVICE_RPI3:
                 return "BCM23";
             default:
-                throw new IllegalStateException("Unknown Build.DEVICE " + Build.DEVICE);
+                throw new IllegalStateException("Unknown board " + Build.DEVICE);
         }
     }
 

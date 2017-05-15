@@ -1,12 +1,11 @@
-package com.kevalpatel2106.robocar.things.mocks.ultrasonic;
+package com.kevalpatel2106.robocar.things.radar;
 
 import android.os.Handler;
 import android.os.HandlerThread;
-import android.support.annotation.NonNull;
 
 import com.google.android.things.pio.Gpio;
 import com.google.android.things.pio.GpioCallback;
-import com.google.android.things.pio.PeripheralManagerService;
+import com.kevalpatel2106.robocar.things.exception.GpoInitializationException;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -18,17 +17,18 @@ import java.util.concurrent.TimeUnit;
  * simultaneous tasks.
  *
  * @author Keval {https://github.com/kevalpatel2106}
+ * @see 'https://cdn.sparkfun.com/datasheets/Sensors/Proximity/HCSR04.pdf'
  */
 
-public final class Hcsr04 implements AutoCloseable {
+public abstract class Radar implements AutoCloseable {
     private static final int INTERVAL_BETWEEN_TRIGGERS = 65;    //Interval between two subsequent pulses
     private static final int TRIG_DURATION_IN_NANO = 10000;     //Trigger pulse duration
-
-    private final ProximityAlertListener mListener;   //Listener to get call back when distance changes
 
     private Gpio mEchoPin;                  //GPIO for echo
     private Gpio mTrigger;                  //GPIO for trigger
     private Handler mTriggerHandler;        //Handler for trigger.
+
+    private boolean isTrasmitting;
 
     /**
      * Runnable to send trigger pulses.
@@ -60,8 +60,7 @@ public final class Hcsr04 implements AutoCloseable {
                     //Calculate distance.
                     //From data-sheet (https://cdn.sparkfun.com/datasheets/Sensors/Proximity/HCSR04.pdf)
                     //Notify callback
-                    double distance = TimeUnit.NANOSECONDS.toMicros(System.nanoTime() - mPulseStartTime) / 58.23;
-                    mListener.onProximityDistanceChange(distance);
+                    newDistance(TimeUnit.NANOSECONDS.toMicros(System.nanoTime() - mPulseStartTime) / 58.23);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -76,29 +75,38 @@ public final class Hcsr04 implements AutoCloseable {
     };
 
     /**
-     * Public constructor.
-     *
-     * @param triggerPin Name of the trigger pin
-     * @param echoPin    Name of the echo pin
-     * @param listener   {@link ProximityAlertListener} to get callbacks when distance changes.
+     * Constructor.
      */
-    public Hcsr04(@NonNull String triggerPin,
-                  @NonNull String echoPin,
-                  @NonNull ProximityAlertListener listener,
-                  @NonNull PeripheralManagerService service) {
+    Radar() {
         try {
-            setTriggerPin(service, triggerPin);
-            setEchoPin(service, echoPin);
+            //Set the echo pins
+            mEchoPin = getEchoPin();
+            mEchoPin.setDirection(Gpio.DIRECTION_IN);
+            mEchoPin.setEdgeTriggerType(Gpio.EDGE_BOTH);
+            mEchoPin.setActiveType(Gpio.ACTIVE_HIGH);
+
+            // Prepare handler for GPIO callback
+            HandlerThread handlerThread = new HandlerThread("EchoCallbackHandlerThread");
+            handlerThread.start();
+            mEchoPin.registerGpioCallback(mEchoCallback, new Handler(handlerThread.getLooper()));
+
+            //Set the trigger pin
+            mTrigger = getTriggerPin();
+            mTrigger.setDirection(Gpio.DIRECTION_OUT_INITIALLY_LOW);
         } catch (IOException e) {
             e.printStackTrace();
-            throw new IllegalArgumentException("Invalid pin name.");
+            throw new GpoInitializationException();
         }
+    }
 
-        //Set callback listener.
-        mListener = listener;
-        //noinspection ConstantConditions
-        if (mListener == null)
-            throw new IllegalArgumentException("ProximityAlertListener cannot be null.");
+    /**
+     * Start transmitting the trigger pulses.
+     */
+    @SuppressWarnings("WeakerAccess")
+    public void startTransmission() {
+        if (isTrasmitting) return;
+
+        isTrasmitting = true;
 
         //Start sending pulses
         //We are using different thread for sending pulses to increase time accuracy.
@@ -109,38 +117,34 @@ public final class Hcsr04 implements AutoCloseable {
     }
 
     /**
-     * Set the trigger pin
-     *
-     * @param service    {@link PeripheralManagerService}.
-     * @param triggerPin Name of the trigger pin.
-     * @throws IOException If pin initialization fails.
+     * Stop transmitting trigger pulses.
      */
-    private void setTriggerPin(PeripheralManagerService service, String triggerPin) throws IOException {
-        mTrigger = service.openGpio(triggerPin);
-        mTrigger.setDirection(Gpio.DIRECTION_OUT_INITIALLY_LOW);
+    @SuppressWarnings("WeakerAccess")
+    public void stopTransmission() {
+        if (isTrasmitting) {
+            mTriggerHandler.removeCallbacks(mTriggerRunnable);
+            isTrasmitting = false;
+        }
     }
 
     /**
-     * Set the echo pin
+     * Abstract method to get GPIO pin for the trigger. Assign the GPIO pin, which is connected to
+     * trigger pin of the sensor.
      *
-     * @param service {@link PeripheralManagerService}.
-     * @param echoPin Name of the echo pin.
-     * @throws IOException If pin initialization fails.
+     * @return {@link Gpio} for trigger.
      */
-    private void setEchoPin(PeripheralManagerService service, String echoPin) throws IOException {
-        mEchoPin = service.openGpio(echoPin);
-        mEchoPin.setDirection(Gpio.DIRECTION_IN);
-        mEchoPin.setEdgeTriggerType(Gpio.EDGE_BOTH);
-        mEchoPin.setActiveType(Gpio.ACTIVE_HIGH);
-
-        // Prepare handler for GPIO callback
-        HandlerThread handlerThread = new HandlerThread("EchoCallbackHandlerThread");
-        handlerThread.start();
-        mEchoPin.registerGpioCallback(mEchoCallback, new Handler(handlerThread.getLooper()));
-    }
+    protected abstract Gpio getTriggerPin();
 
     /**
-     * Fire trigger pulse for 10 micro seconds.
+     * Abstract method to get GPIO pin for the echo. Assign the GPIO pin, which is connected to
+     * echo pin of the sensor.
+     *
+     * @return {@link Gpio} for trigger.
+     */
+    protected abstract Gpio getEchoPin();
+
+    /**
+     * Fire trigger pulse for {@link #TRIG_DURATION_IN_NANO} nano seconds.
      */
     private void sendTriggerPulse() throws IOException, InterruptedException {
         //Resetting trigger
@@ -155,10 +159,32 @@ public final class Hcsr04 implements AutoCloseable {
         mTrigger.setValue(false);
     }
 
+    /**
+     * Close the radar.
+     *
+     * @throws IOException If error occurs while closing GPIO.
+     */
     @Override
     public void close() throws IOException {
+        stopTransmission();
         mEchoPin.unregisterGpioCallback(mEchoCallback);
         mEchoPin.close();
         mTrigger.close();
+    }
+
+    /**
+     * Abstract method to do something when the distance gets updated.
+     * Whenever new distance is calculated this method will be called.
+     *
+     * @param distanceInCm Distance from the obstacle in cm.
+     */
+    protected abstract void newDistance(double distanceInCm);
+
+    /**
+     * @return Returns true if the radar is transmitting trigger pulses.
+     */
+    @SuppressWarnings("WeakerAccess")
+    public boolean isTrasmitting() {
+        return isTrasmitting;
     }
 }

@@ -14,11 +14,18 @@ android {
 }
 
 dependencies {
+    compile project(':common')
     provided 'com.google.android.things:androidthings:0.3-devpreview'
 
-    compile 'com.nanohttpd:nanohttpd-webserver:2.2.0'
+    //Support lib
     compile 'com.android.support:appcompat-v7:25.3.1'
+
+    //Java webserver
+    compile 'com.nanohttpd:nanohttpd-webserver:2.2.0'
+
+    //Beacon library
     compile 'org.altbeacon:android-beacon-library:2.9.2'
 
-    compile project(':common')
+    //Open cv
+    compile 'org.bytedeco.javacpp-presets:opencv-platform:3.2.0-1.3'
 }
