@@ -20,7 +20,7 @@ import android.support.annotation.NonNull;
 
 import com.google.android.things.pio.Gpio;
 import com.google.android.things.pio.PeripheralManagerService;
-import com.kevalpatel2106.robocar.things.exception.GpoInitializationException;
+import com.kevalpatel2106.robocar.things.exception.GpioInitializationException;
 import com.kevalpatel2106.robocar.things.processor.BoardDefaults;
 
 import java.io.IOException;
@@ -53,7 +53,7 @@ public class FrontRadar extends RadarMock implements Hcsr04.DistanceListener {
             mHcsr04 = new Hcsr04(echoPin, trigPin, this);
         } catch (IOException e) {
             e.printStackTrace();
-            throw new GpoInitializationException();
+            throw new GpioInitializationException();
         }
 
         mListener = listener;

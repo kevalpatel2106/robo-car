@@ -22,7 +22,7 @@ import android.support.annotation.NonNull;
 
 import com.google.android.things.pio.Gpio;
 import com.google.android.things.pio.GpioCallback;
-import com.kevalpatel2106.robocar.things.exception.GpoInitializationException;
+import com.kevalpatel2106.robocar.things.exception.GpioInitializationException;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -116,7 +116,7 @@ final class Hcsr04 implements AutoCloseable {
             mTrigger.setDirection(Gpio.DIRECTION_OUT_INITIALLY_LOW);
         } catch (IOException e) {
             e.printStackTrace();
-            throw new GpoInitializationException();
+            throw new GpioInitializationException();
         }
 
         mListener = listener;

@@ -23,9 +23,9 @@ package com.kevalpatel2106.robocar.things.exception;
  * @author Keval {https://github.com/kevalpatel2106}
  */
 
-public class GpoInitializationException extends RuntimeException {
+public class GpioInitializationException extends RuntimeException {
 
-    public GpoInitializationException() {
+    public GpioInitializationException() {
         super("Cannot initialize GPIO.");
     }
 }

@@ -20,7 +20,7 @@ import android.support.annotation.NonNull;
 
 import com.google.android.things.pio.Gpio;
 import com.google.android.things.pio.PeripheralManagerService;
-import com.kevalpatel2106.robocar.things.exception.GpoInitializationException;
+import com.kevalpatel2106.robocar.things.exception.GpioInitializationException;
 import com.kevalpatel2106.robocar.things.processor.BoardDefaults;
 
 import java.io.IOException;
@@ -55,7 +55,7 @@ public final class LeftMotor extends Motor {
             return service.openGpio(BoardDefaults.getGPIOForIn3());
         } catch (IOException e) {
             e.printStackTrace();
-            throw new GpoInitializationException();
+            throw new GpioInitializationException();
         }
     }
 
@@ -71,7 +71,7 @@ public final class LeftMotor extends Motor {
             return service.openGpio(BoardDefaults.getGPIOForIn4());
         } catch (IOException e) {
             e.printStackTrace();
-            throw new GpoInitializationException();
+            throw new GpioInitializationException();
         }
     }
 }

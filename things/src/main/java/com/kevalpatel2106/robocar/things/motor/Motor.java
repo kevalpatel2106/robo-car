@@ -20,7 +20,7 @@ import android.support.annotation.NonNull;
 
 import com.google.android.things.pio.Gpio;
 import com.google.android.things.pio.PeripheralManagerService;
-import com.kevalpatel2106.robocar.things.exception.GpoInitializationException;
+import com.kevalpatel2106.robocar.things.exception.GpioInitializationException;
 
 import java.io.IOException;
 
@@ -50,7 +50,7 @@ abstract class Motor implements AutoCloseable {
             mMotorControlPin2.setDirection(Gpio.DIRECTION_OUT_INITIALLY_LOW);
         } catch (IOException e) {
             e.printStackTrace();
-            throw new GpoInitializationException();
+            throw new GpioInitializationException();
         }
     }
 
