@@ -16,6 +16,8 @@
 
 package com.kevalpatel2106.robocar.things.radar;
 
+import android.support.annotation.NonNull;
+
 import com.google.android.things.pio.Gpio;
 import com.google.android.things.pio.PeripheralManagerService;
 import com.kevalpatel2106.robocar.things.exception.GpoInitializationException;
@@ -30,55 +32,57 @@ import java.io.IOException;
  * @author Keval {https://github.com/kevalpatel2106}
  */
 
-public class FrontRadar extends Radar {
+public class FrontRadar extends RadarMock implements Hcsr04.DistanceListener {
     private static final double DISTANCE_THRASHOLD_IN_CM = 40;
     private ObstacleAlertListener mListener;
+
+    private Hcsr04 mHcsr04;
 
     /**
      * Public constructor.
      */
-    public FrontRadar(ObstacleAlertListener listener) {
+    public FrontRadar(@NonNull ObstacleAlertListener listener) {
         super();
+
+        //Initialize GPIO
+        try {
+            PeripheralManagerService service = new PeripheralManagerService();
+            Gpio trigPin = service.openGpio(BoardDefaults.getGPIOForFrontRadarTrig());
+            Gpio echoPin = service.openGpio(BoardDefaults.getGPIOForFrontRadarTrig());
+
+            mHcsr04 = new Hcsr04(echoPin, trigPin, this);
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new GpoInitializationException();
+        }
+
         mListener = listener;
     }
 
-    /**
-     * Assign the GPIO pin, which is connected to trigger pin of the sensor.
-     *
-     * @return {@link Gpio} for trigger.
-     */
     @Override
-    protected Gpio getTriggerPin() {
-        try {
-            return new PeripheralManagerService().openGpio(BoardDefaults.getGPIOForFrontRadarTrig());
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new GpoInitializationException();
-        }
+    public void startTransmission() {
+        mHcsr04.startTransmission();
     }
 
-    /**
-     * Assign the GPIO pin, which is connected to echo pin of the sensor.
-     *
-     * @return {@link Gpio} for echo.
-     */
     @Override
-    protected Gpio getEchoPin() {
-        try {
-            return new PeripheralManagerService().openGpio(BoardDefaults.getGPIOForFrontEcho());
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new GpoInitializationException();
-        }
+    public void stopTransmission() {
+        mHcsr04.stopTransmission();
+    }
+
+    @Override
+    public void turnOff() {
+        mHcsr04.close();
     }
 
     /**
      * Whenever new distance is calculated this method will be called.
      *
-     * @param distanceInCm Distance from the obstacle in cm.
+     * @param newDistance Distance from the obstacle in cm.
      */
     @Override
-    protected void newDistance(double distanceInCm) {
-        if (distanceInCm < DISTANCE_THRASHOLD_IN_CM) mListener.onProximityAlert(this);
+    public void onDistanceUpdated(double newDistance) {
+        if (newDistance < DISTANCE_THRASHOLD_IN_CM) {
+            mListener.onObstacleDetected();
+        }
     }
 }

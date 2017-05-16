@@ -40,7 +40,7 @@ import com.kevalpatel2106.robocar.things.radar.FrontRadar;
 abstract class ChassisMock implements AutoCloseable {
 
     @Nullable
-    private FrontRadar mFrontRadar;   //Radar at the front of the car
+    private FrontRadar mFrontRadar;   //Hcsr04 at the front of the car
 
     @SuppressWarnings("NullableProblems")
     @NonNull

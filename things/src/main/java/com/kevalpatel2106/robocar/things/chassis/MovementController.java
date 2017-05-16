@@ -22,7 +22,6 @@ import android.support.annotation.NonNull;
 
 import com.google.android.things.pio.PeripheralManagerService;
 import com.kevalpatel2106.robocar.things.radar.ObstacleAlertListener;
-import com.kevalpatel2106.robocar.things.radar.Radar;
 
 /**
  * Created by Keval Patel on 14/05/17.
@@ -31,9 +30,26 @@ import com.kevalpatel2106.robocar.things.radar.Radar;
  * @author Keval {https://github.com/kevalpatel2106}
  */
 
-public final class MovementController implements ObstacleAlertListener {
+public final class MovementController {
     private Chassis mChassis;   //Car chassis
     private boolean isLockedForObstacle = false;    //Bool to indicate if the external movement control is locked?
+
+    private ObstacleAlertListener mFrontRadarObstacleListener = new ObstacleAlertListener() {
+        @Override
+        public void onObstacleDetected() {
+            isLockedForObstacle = true;     //Lock external movement
+
+            mChassis.moveReverseInternal();
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    stop();
+                    isLockedForObstacle = false;     //Release external movement control
+                }
+            }, 400);
+        }
+    };
 
     /**
      * Public constructor.
@@ -43,7 +59,7 @@ public final class MovementController implements ObstacleAlertListener {
      */
     public MovementController(@NonNull Context context,
                               @NonNull PeripheralManagerService service) {
-        mChassis = new Chassis(context, service, this);
+        mChassis = new Chassis(context, service, mFrontRadarObstacleListener);
 
         //Reset the motion
         stop();
@@ -86,23 +102,6 @@ public final class MovementController implements ObstacleAlertListener {
      */
     public void stop() {
         mChassis.stopInternal();
-    }
-
-    @Override
-    public void onProximityAlert(Radar radar) {
-        if (radar == mChassis.getFrontRadar()) {
-            isLockedForObstacle = true;     //Lock external movement
-
-            mChassis.moveReverseInternal();
-            Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    stop();
-                    isLockedForObstacle = false;     //Release external movement control
-                }
-            }, 400);
-        }
     }
 
     /**

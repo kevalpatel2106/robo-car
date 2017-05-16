@@ -109,7 +109,7 @@ abstract class Motor implements AutoCloseable {
     /**
      * Release the motor control.
      *
-     * @throws Exception If {@link Gpio} cannot be close.
+     * @throws Exception If {@link Gpio} cannot be turnOff.
      */
     @Override
     public void close() throws Exception {

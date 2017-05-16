@@ -154,7 +154,7 @@ final class Chassis extends ChassisMock {
         getLeftMotor().close();
         getRightMotor().close();
 
-        if (getFrontRadar() != null) getFrontRadar().close();
+        if (getFrontRadar() != null) getFrontRadar().turnOff();
         if (getBeacon() != null) getBeacon().stopBeaconTransmission();
     }
 }

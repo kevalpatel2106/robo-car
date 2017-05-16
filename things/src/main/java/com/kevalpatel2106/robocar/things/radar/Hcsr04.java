@@ -18,6 +18,7 @@ package com.kevalpatel2106.robocar.things.radar;
 
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.support.annotation.NonNull;
 
 import com.google.android.things.pio.Gpio;
 import com.google.android.things.pio.GpioCallback;
@@ -36,16 +37,15 @@ import java.util.concurrent.TimeUnit;
  * @see 'https://cdn.sparkfun.com/datasheets/Sensors/Proximity/HCSR04.pdf'
  */
 
-public abstract class Radar implements AutoCloseable {
+final class Hcsr04 implements AutoCloseable {
     private static final int INTERVAL_BETWEEN_TRIGGERS = 65;    //Interval between two subsequent pulses
     private static final int TRIG_DURATION_IN_NANO = 10000;     //Trigger pulse duration
-
+    @NonNull
+    private final DistanceListener mListener;
     private Gpio mEchoPin;                  //GPIO for echo
     private Gpio mTrigger;                  //GPIO for trigger
     private Handler mTriggerHandler;        //Handler for trigger.
-
-    private boolean isTrasmitting;
-
+    private boolean isTransmitting;
     /**
      * Runnable to send trigger pulses.
      */
@@ -60,7 +60,6 @@ public abstract class Radar implements AutoCloseable {
             }
         }
     };
-
     /**
      * Callback for {@link #mEchoPin}. This callback will be called on both edges.
      */
@@ -76,7 +75,7 @@ public abstract class Radar implements AutoCloseable {
                     //Calculate distance.
                     //From data-sheet (https://cdn.sparkfun.com/datasheets/Sensors/Proximity/HCSR04.pdf)
                     //Notify callback
-                    newDistance(TimeUnit.NANOSECONDS.toMicros(System.nanoTime() - mPulseStartTime) / 58.23);
+                    mListener.onDistanceUpdated(TimeUnit.NANOSECONDS.toMicros(System.nanoTime() - mPulseStartTime) / 58.23);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -92,11 +91,17 @@ public abstract class Radar implements AutoCloseable {
 
     /**
      * Constructor.
+     *
+     * @param echoPin    {@link Gpio} for echo pin of the sensor.
+     * @param triggerPin {@link Gpio} for trigger pin.
+     * @param listener   {@link DistanceListener} to get distance update  callbacks.
      */
-    Radar() {
+    Hcsr04(@NonNull Gpio echoPin,
+           @NonNull Gpio triggerPin,
+           @NonNull DistanceListener listener) {
         try {
             //Set the echo pins
-            mEchoPin = getEchoPin();
+            mEchoPin = echoPin;
             mEchoPin.setDirection(Gpio.DIRECTION_IN);
             mEchoPin.setEdgeTriggerType(Gpio.EDGE_BOTH);
             mEchoPin.setActiveType(Gpio.ACTIVE_HIGH);
@@ -107,12 +112,14 @@ public abstract class Radar implements AutoCloseable {
             mEchoPin.registerGpioCallback(mEchoCallback, new Handler(handlerThread.getLooper()));
 
             //Set the trigger pin
-            mTrigger = getTriggerPin();
+            mTrigger = triggerPin;
             mTrigger.setDirection(Gpio.DIRECTION_OUT_INITIALLY_LOW);
         } catch (IOException e) {
             e.printStackTrace();
             throw new GpoInitializationException();
         }
+
+        mListener = listener;
     }
 
     /**
@@ -120,9 +127,9 @@ public abstract class Radar implements AutoCloseable {
      */
     @SuppressWarnings("WeakerAccess")
     public void startTransmission() {
-        if (isTrasmitting) return;
+        if (isTransmitting) return;
 
-        isTrasmitting = true;
+        isTransmitting = true;
 
         //Start sending pulses
         //We are using different thread for sending pulses to increase time accuracy.
@@ -137,27 +144,11 @@ public abstract class Radar implements AutoCloseable {
      */
     @SuppressWarnings("WeakerAccess")
     public void stopTransmission() {
-        if (isTrasmitting) {
+        if (isTransmitting) {
             mTriggerHandler.removeCallbacks(mTriggerRunnable);
-            isTrasmitting = false;
+            isTransmitting = false;
         }
     }
-
-    /**
-     * Abstract method to get GPIO pin for the trigger. Assign the GPIO pin, which is connected to
-     * trigger pin of the sensor.
-     *
-     * @return {@link Gpio} for trigger.
-     */
-    protected abstract Gpio getTriggerPin();
-
-    /**
-     * Abstract method to get GPIO pin for the echo. Assign the GPIO pin, which is connected to
-     * echo pin of the sensor.
-     *
-     * @return {@link Gpio} for trigger.
-     */
-    protected abstract Gpio getEchoPin();
 
     /**
      * Fire trigger pulse for {@link #TRIG_DURATION_IN_NANO} nano seconds.
@@ -177,30 +168,41 @@ public abstract class Radar implements AutoCloseable {
 
     /**
      * Close the radar.
-     *
-     * @throws IOException If error occurs while closing GPIO.
      */
     @Override
-    public void close() throws IOException {
-        stopTransmission();
-        mEchoPin.unregisterGpioCallback(mEchoCallback);
-        mEchoPin.close();
-        mTrigger.close();
+    public void close() {
+        try {
+            stopTransmission();
+            mEchoPin.unregisterGpioCallback(mEchoCallback);
+            mEchoPin.close();
+            mTrigger.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
-
-    /**
-     * Abstract method to do something when the distance gets updated.
-     * Whenever new distance is calculated this method will be called.
-     *
-     * @param distanceInCm Distance from the obstacle in cm.
-     */
-    protected abstract void newDistance(double distanceInCm);
 
     /**
      * @return Returns true if the radar is transmitting trigger pulses.
      */
-    @SuppressWarnings("WeakerAccess")
-    public boolean isTrasmitting() {
-        return isTrasmitting;
+    @SuppressWarnings({"WeakerAccess", "unused"})
+    public boolean isTransmitting() {
+        return isTransmitting;
     }
+
+    /**
+     * Callback listener to get notified when proximity alert triggers for any radar.
+     *
+     * @author Keval {https://github.com/kevalpatel2106}
+     */
+
+    interface DistanceListener {
+
+        /**
+         * Method to execute when new distance is update.
+         *
+         * @param newDistance New distance in cm.
+         */
+        void onDistanceUpdated(double newDistance);
+    }
+
 }

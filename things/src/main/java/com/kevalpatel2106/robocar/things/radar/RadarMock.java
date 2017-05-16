@@ -17,15 +17,17 @@
 package com.kevalpatel2106.robocar.things.radar;
 
 /**
- * Callback listener to get notified when proximity alert triggers for any radar.
- *
- * @author Keval {https://github.com/kevalpatel2106}
+ * Created by Keval on 16-May-17.
  */
 
-public interface ObstacleAlertListener {
+abstract class RadarMock {
 
-    /**
-     * Method to execute when obstacle is detected.
-     */
-    void onObstacleDetected();
+    RadarMock() {
+    }
+
+    public abstract void startTransmission();
+
+    public abstract void stopTransmission();
+
+    public abstract void turnOff();
 }

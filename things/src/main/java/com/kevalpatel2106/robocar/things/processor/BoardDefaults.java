@@ -25,6 +25,26 @@ import java.util.List;
 /**
  * Class to map different GPIO pins to hardware components.
  *
+ * List of GPIO utilized:
+ *
+ * - Motor control
+ * <li>BCM5</li>
+ * <li>BCM6</li>
+ * <li>BCM22</li>
+ * <li>BCM27</li>
+ *
+ * - Front radar
+ * <li>BCM24</li>
+ * <li>BCM23</li>
+ *
+ * - LCD display (4-bit mode)
+ * <li>BCM26</li>
+ * <li>BCM19</li>
+ * <li>BCM21</li>
+ * <li>BCM20</li>
+ * <li>BCM16</li>
+ * <li>BCM12</li>
+ *
  * @author Keval {https://github.com/kevalpatel2106}
  */
 @SuppressWarnings("WeakerAccess")
@@ -116,6 +136,60 @@ public final class BoardDefaults {
         switch (getBoardVariant()) {
             case DEVICE_RPI3:
                 return "BCM23";
+            default:
+                throw new IllegalStateException("Unknown board " + Build.DEVICE);
+        }
+    }
+
+    public static String getGPIOForLCDRs() {
+        switch (getBoardVariant()) {
+            case DEVICE_RPI3:
+                return "BCM26";
+            default:
+                throw new IllegalStateException("Unknown board " + Build.DEVICE);
+        }
+    }
+
+    public static String getGPIOForLCDEn() {
+        switch (getBoardVariant()) {
+            case DEVICE_RPI3:
+                return "BCM19";
+            default:
+                throw new IllegalStateException("Unknown board " + Build.DEVICE);
+        }
+    }
+
+    public static String getGPIOForLCDD4() {
+        switch (getBoardVariant()) {
+            case DEVICE_RPI3:
+                return "BCM21";
+            default:
+                throw new IllegalStateException("Unknown board " + Build.DEVICE);
+        }
+    }
+
+    public static String getGPIOForLCDD5() {
+        switch (getBoardVariant()) {
+            case DEVICE_RPI3:
+                return "BCM20";
+            default:
+                throw new IllegalStateException("Unknown board " + Build.DEVICE);
+        }
+    }
+
+    public static String getGPIOForLCDD6() {
+        switch (getBoardVariant()) {
+            case DEVICE_RPI3:
+                return "BCM16";
+            default:
+                throw new IllegalStateException("Unknown board " + Build.DEVICE);
+        }
+    }
+
+    public static String getGPIOForLCDD7() {
+        switch (getBoardVariant()) {
+            case DEVICE_RPI3:
+                return "BCM12";
             default:
                 throw new IllegalStateException("Unknown board " + Build.DEVICE);
         }
