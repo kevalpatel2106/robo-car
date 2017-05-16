@@ -48,7 +48,7 @@ public class FrontRadar extends RadarMock implements Hcsr04.DistanceListener {
         try {
             PeripheralManagerService service = new PeripheralManagerService();
             Gpio trigPin = service.openGpio(BoardDefaults.getGPIOForFrontRadarTrig());
-            Gpio echoPin = service.openGpio(BoardDefaults.getGPIOForFrontRadarTrig());
+            Gpio echoPin = service.openGpio(BoardDefaults.getGPIOForFrontEcho());
 
             mHcsr04 = new Hcsr04(echoPin, trigPin, this);
         } catch (IOException e) {

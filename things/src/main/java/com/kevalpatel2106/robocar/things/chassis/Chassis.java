@@ -123,6 +123,7 @@ public final class Chassis extends ChassisMock {
 
         if (mBuilder.mFrontRadar != null) mBuilder.mFrontRadar.turnOff();
         if (mBuilder.mBeacon != null) mBuilder.mBeacon.stopBeaconTransmission();
+        if (mBuilder.mDisplay != null) mBuilder.mDisplay.turnOff();
     }
 
     public static class Builder extends ChassisMock.BuilderMock {
@@ -191,6 +192,7 @@ public final class Chassis extends ChassisMock {
         @Override
         public Builder mountDisplay() {
             mDisplay = new Display();
+            mDisplay.turnOn();
             return this;
         }
 

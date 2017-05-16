@@ -58,13 +58,11 @@ public class Display extends DisplayMock {
             if (lines.length > 2) throw new RuntimeException("Cannot print more than 2 lines.");
 
             //Print the line 1
-            mLcd.print(lines[0]);
-
-            //Move the cursor to line 2
-            mLcd.setCursor(0, 1);
-
-            //Print the line 2
-            mLcd.print(lines[1]);
+            for (String line : lines) {
+                mLcd.print(line);
+                //Move the cursor to line 2
+                mLcd.setCursor(0, 1);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
