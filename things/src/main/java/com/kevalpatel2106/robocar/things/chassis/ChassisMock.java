@@ -16,13 +16,17 @@
 
 package com.kevalpatel2106.robocar.things.chassis;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.google.android.things.pio.PeripheralManagerService;
 import com.kevalpatel2106.robocar.things.beacon.Beacon;
+import com.kevalpatel2106.robocar.things.display.Display;
 import com.kevalpatel2106.robocar.things.motor.LeftMotor;
 import com.kevalpatel2106.robocar.things.motor.RightMotor;
 import com.kevalpatel2106.robocar.things.radar.FrontRadar;
+import com.kevalpatel2106.robocar.things.radar.ObstacleAlertListener;
 
 /**
  * Created by Keval on 15-May-17.
@@ -33,111 +37,66 @@ import com.kevalpatel2106.robocar.things.radar.FrontRadar;
  * <li>Beacon - Optional</li>
  * <li>Motors - Required</li>
  * <li>Front radar - Optional</li>
+ * <li>Display - Optional</li>
  *
  * @author Keval {https://github.com/kevalpatel2106}
  */
 
-abstract class ChassisMock implements AutoCloseable {
-
-    @Nullable
-    private FrontRadar mFrontRadar;   //Hcsr04 at the front of the car
-
-    @SuppressWarnings("NullableProblems")
-    @NonNull
-    private RightMotor mRightMotor;   //Right motor.
-
-    @SuppressWarnings("NullableProblems")
-    @NonNull
-    private LeftMotor mLeftMotor;     //Left side motor
-
-    @Nullable
-    private Beacon mBeacon;           //Alt beacon.
-
+abstract class ChassisMock {
     /**
      * Public constructor.
      */
     ChassisMock() {
     }
-
     /**
-     * Mount the component and build the chassis.
+     * Turn off the components on chassis.
      */
-    @SuppressWarnings("ConstantConditions")
-    protected void build() {
-        mFrontRadar = mountFrontRadar();
-        mBeacon = mountBeacon();
-
-        mLeftMotor = mountLeftMotor();
-        if (mLeftMotor == null)
-            throw new IllegalArgumentException("Cannot set left motor to null. Are you building car?");
-
-        mRightMotor = mountRightMotor();
-        if (mRightMotor == null)
-            throw new IllegalArgumentException("Cannot set right motor to null. Are you building car?");
-
-        //Initialize the components.
-        init();
-    }
-
-    /**
-     * This is an abstract method to initialize the components. (e.g. Start radar, start beacon etc)
-     * This method will be called after the chassis is built.
-     *
-     * @see #build()
-     */
-    protected abstract void init();
-
-    /**
-     * Mount the front radar. If your car does not have front radar pass null.
-     *
-     * @return {@link FrontRadar}
-     */
-    @Nullable
-    protected abstract FrontRadar mountFrontRadar();
-
-    /**
-     * Mount the left side motor. It's value cannot be null.
-     *
-     * @return {@link LeftMotor}
-     */
-    @SuppressWarnings("NullableProblems")
-    @NonNull
-    protected abstract LeftMotor mountLeftMotor();
-
-    /**
-     * Mount the right side motor. It's value cannot be null.
-     *
-     * @return {@link RightMotor}
-     */
-    @SuppressWarnings("NullableProblems")
-    @NonNull
-    protected abstract RightMotor mountRightMotor();
-
-    /**
-     * Mount the beacon. If your car does not have beacon pass null.
-     *
-     * @return {@link Beacon}
-     */
-    @Nullable
-    protected abstract Beacon mountBeacon();
+    public abstract void turnOff() throws Exception;
 
     @Nullable
-    FrontRadar getFrontRadar() {
-        return mFrontRadar;
-    }
+    public abstract FrontRadar getFrontRadar();
+
 
     @NonNull
-    RightMotor getRightMotor() {
-        return mRightMotor;
-    }
+    public abstract RightMotor getRightMotor();
 
     @NonNull
-    LeftMotor getLeftMotor() {
-        return mLeftMotor;
-    }
+    public abstract LeftMotor getLeftMotor();
 
     @Nullable
-    Beacon getBeacon() {
-        return mBeacon;
+    public abstract Beacon getBeacon();
+
+    @Nullable
+    public abstract Display getDisplay();
+
+    protected static abstract class BuilderMock {
+        /**
+         * Mount the front radar. This is an optional component.
+         */
+        public abstract BuilderMock mountFrontRadar(@NonNull ObstacleAlertListener listener);
+
+        /**
+         * Mount the left side motor.
+         */
+        @SuppressWarnings("NullableProblems")
+        public abstract BuilderMock mountLeftMotor(@NonNull PeripheralManagerService service);
+
+        /**
+         * Mount the right side motor.
+         */
+        @SuppressWarnings("NullableProblems")
+        public abstract BuilderMock mountRightMotor(@NonNull PeripheralManagerService service);
+
+        /**
+         * Mount the beacon. This is an optional component.
+         */
+        public abstract BuilderMock mountBeacon(@NonNull Context context);
+
+        /**
+         * Mount the front display. This is an optional component.
+         */
+        public abstract BuilderMock mountDisplay();
+
+        public abstract ChassisMock build();
     }
 }

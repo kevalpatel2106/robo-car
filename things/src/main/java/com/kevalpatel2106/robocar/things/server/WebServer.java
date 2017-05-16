@@ -22,7 +22,7 @@ import android.util.Log;
 
 import com.kevalpatel2106.common.EndPoints;
 import com.kevalpatel2106.common.RoboCommands;
-import com.kevalpatel2106.robocar.things.chassis.MovementController;
+import com.kevalpatel2106.robocar.things.Controller;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,22 +43,22 @@ public final class WebServer extends NanoHTTPD {
     private static final String TAG = WebServer.class.getSimpleName();
 
     @NonNull
-    private final MovementController mMovementController;
+    private final Controller mController;
     @NonNull
     private final AssetManager mAssetManager;
 
     /**
      * Start the web server.
      *
-     * @param movementController {@link MovementController} to control the movement.
+     * @param controller {@link Controller} to control the movement.
      * @param assetManager       {@link AssetManager} to load html wepages from assets.
      * @throws IOException If failed to initialize.
      */
-    public WebServer(@NonNull MovementController movementController,
+    public WebServer(@NonNull Controller controller,
                      @NonNull AssetManager assetManager) throws IOException {
         super(8080);
 
-        mMovementController = movementController;
+        mController = controller;
         mAssetManager = assetManager;
 
         //Start the server
@@ -82,19 +82,19 @@ public final class WebServer extends NanoHTTPD {
 
                         switch (params.get(EndPoints.PARAM_COMMAND)) {
                             case RoboCommands.MOVE_FORWARD:
-                                mMovementController.moveForward();
+                                mController.moveForward();
                                 return newFixedLengthResponse("{\"s\":\"Ok\"}");
                             case RoboCommands.MOVE_REVERSE:
-                                mMovementController.moveReverse();
+                                mController.moveReverse();
                                 return newFixedLengthResponse("{\"s\":\"Ok\"}");
                             case RoboCommands.TURN_RIGHT:
-                                mMovementController.turnRight();
+                                mController.turnRight();
                                 return newFixedLengthResponse("{\"s\":\"Ok\"}");
                             case RoboCommands.TURN_LEFT:
-                                mMovementController.turnLeft();
+                                mController.turnLeft();
                                 return newFixedLengthResponse("{\"s\":\"Ok\"}");
                             case RoboCommands.STOP:
-                                mMovementController.stop();
+                                mController.stop();
                                 return newFixedLengthResponse("{\"s\":\"Ok\"}");
                         }
                         break;

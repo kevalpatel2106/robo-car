@@ -22,6 +22,7 @@ import android.support.annotation.Nullable;
 
 import com.google.android.things.pio.PeripheralManagerService;
 import com.kevalpatel2106.robocar.things.beacon.Beacon;
+import com.kevalpatel2106.robocar.things.display.Display;
 import com.kevalpatel2106.robocar.things.motor.LeftMotor;
 import com.kevalpatel2106.robocar.things.motor.RightMotor;
 import com.kevalpatel2106.robocar.things.radar.FrontRadar;
@@ -34,127 +35,173 @@ import com.kevalpatel2106.robocar.things.radar.ObstacleAlertListener;
  * @author Keval {https://github.com/kevalpatel2106}
  */
 
-final class Chassis extends ChassisMock {
-    @NonNull
-    private final Context mContext;
-    @NonNull
-    private final PeripheralManagerService mService;
-    @NonNull
-    private final ObstacleAlertListener mListener;
+public final class Chassis extends ChassisMock {
+    private Builder mBuilder;
 
     /**
      * Public constructor.
-     *
-     * @param context  Instance of caller
-     * @param service  {@link PeripheralManagerService}
-     * @param listener {@link ObstacleAlertListener}
      */
-    Chassis(@NonNull Context context,
-            @NonNull PeripheralManagerService service,
-            @NonNull ObstacleAlertListener listener) {
-        mContext = context;
-        mService = service;
-        mListener = listener;
-
-        build();
+    private Chassis(Builder builder) {
+        mBuilder = builder;
     }
 
-    @Override
-    protected void init() {
-        if (getFrontRadar() != null) getFrontRadar().startTransmission();
-        if (getBeacon() != null) getBeacon().initBeaconTransmission();
-    }
-
-    /**
-     * Mount the front radar. If your car does not have front radar pass null.
-     *
-     * @return {@link FrontRadar}
-     */
-    @Override
     @Nullable
-    protected FrontRadar mountFrontRadar() {
-        return new FrontRadar(mListener);
+    @Override
+    public FrontRadar getFrontRadar() {
+        return mBuilder.mFrontRadar;
     }
 
-    /**
-     * Mount the left side motor. It's value cannot be null.
-     *
-     * @return {@link LeftMotor}
-     */
-    @Override
     @NonNull
-    protected LeftMotor mountLeftMotor() {
-        return new LeftMotor(mService);
+    @Override
+    public RightMotor getRightMotor() {
+        return mBuilder.mRightMotor;
     }
 
-    /**
-     * Mount the right side motor. It's value cannot be null.
-     *
-     * @return {@link RightMotor}
-     */
-    @Override
     @NonNull
-    protected RightMotor mountRightMotor() {
-        return new RightMotor(mService);
+    @Override
+    public LeftMotor getLeftMotor() {
+        return mBuilder.mLeftMotor;
     }
 
-    /**
-     * Mount the beacon. If your car does not have beacon pass null.
-     *
-     * @return {@link Beacon}
-     */
-    @Override
     @Nullable
-    protected Beacon mountBeacon() {
-        return new Beacon(mContext);
+    @Override
+    public Beacon getBeacon() {
+        return mBuilder.mBeacon;
+    }
+
+    @Nullable
+    @Override
+    public Display getDisplay() {
+        return mBuilder.mDisplay;
     }
 
     /**
-     * Take a left turn.
+     * Take a left turn. This method is for internal use only.
      */
-    void turnLeftInternal() {
-        getLeftMotor().reverse();
-        getRightMotor().forward();
+    public void turnLeftInternal() {
+        mBuilder.mLeftMotor.reverse();
+        mBuilder.mRightMotor.forward();
     }
 
     /**
-     * Take a right turn.
+     * Take a right turn. This method is for internal use only.
      */
-    void turnRightInternal() {
-        getLeftMotor().forward();
-        getRightMotor().reverse();
+    public void turnRightInternal() {
+        mBuilder.mLeftMotor.forward();
+        mBuilder.mRightMotor.reverse();
     }
 
     /**
-     * Move forward.
+     * Move forward. This method is for internal use only.
      */
-    void moveForwardInternal() {
-        getLeftMotor().forward();
-        getRightMotor().forward();
+    public void moveForwardInternal() {
+        mBuilder.mLeftMotor.forward();
+        mBuilder.mRightMotor.forward();
     }
 
     /**
-     * Move reverse.
+     * Move reverse. This method is for internal use only.
      */
-    void moveReverseInternal() {
-        getLeftMotor().reverse();
-        getRightMotor().reverse();
+    public void moveReverseInternal() {
+        mBuilder.mLeftMotor.reverse();
+        mBuilder.mRightMotor.reverse();
     }
 
     /**
-     * Stop the motor.
+     * Stop the motor. This method is for internal use only.
      */
-    void stopInternal() {
-        getLeftMotor().stop();
-        getRightMotor().stop();
+    public void stopInternal() {
+        mBuilder.mLeftMotor.stop();
+        mBuilder.mRightMotor.stop();
     }
+
 
     @Override
-    public void close() throws Exception {
-        getLeftMotor().close();
-        getRightMotor().close();
+    public void turnOff() throws Exception {
+        mBuilder.mLeftMotor.close();
+        mBuilder.mRightMotor.close();
 
-        if (getFrontRadar() != null) getFrontRadar().turnOff();
-        if (getBeacon() != null) getBeacon().stopBeaconTransmission();
+        if (mBuilder.mFrontRadar != null) mBuilder.mFrontRadar.turnOff();
+        if (mBuilder.mBeacon != null) mBuilder.mBeacon.stopBeaconTransmission();
+    }
+
+    public static class Builder extends ChassisMock.BuilderMock {
+
+        @Nullable
+        private FrontRadar mFrontRadar;   //Hcsr04 at the front of the car
+
+        @SuppressWarnings("NullableProblems")
+        @NonNull
+        private RightMotor mRightMotor;   //Right motor.
+
+        @SuppressWarnings("NullableProblems")
+        @NonNull
+        private LeftMotor mLeftMotor;     //Left side motor
+
+        @Nullable
+        private Beacon mBeacon;           //Alt beacon.
+
+        @Nullable
+        private Display mDisplay;           //Front display
+
+        public Builder() {
+        }
+
+        /**
+         * Mount the front radar.
+         */
+        @Override
+        public Builder mountFrontRadar(@NonNull ObstacleAlertListener listener) {
+            mFrontRadar = new FrontRadar(listener);
+            mFrontRadar.startTransmission();
+            return this;
+        }
+
+        /**
+         * Mount the left side motor.
+         */
+        @Override
+        public Builder mountLeftMotor(@NonNull PeripheralManagerService service) {
+            mLeftMotor = new LeftMotor(service);
+            return this;
+        }
+
+        /**
+         * Mount the right side motor.
+         */
+        @Override
+        public Builder mountRightMotor(@NonNull PeripheralManagerService service) {
+            mRightMotor = new RightMotor(service);
+            return this;
+        }
+
+        /**
+         * Mount the beacon.
+         */
+        @Override
+        public Builder mountBeacon(@NonNull Context context) {
+            mBeacon = new Beacon(context);
+            mBeacon.initBeaconTransmission();
+            return this;
+        }
+
+        /**
+         * Mount the display.
+         */
+        @Override
+        public Builder mountDisplay() {
+            mDisplay = new Display();
+            return this;
+        }
+
+        @SuppressWarnings("ConstantConditions")
+        @Override
+        public Chassis build() {
+            if (mLeftMotor == null)
+                throw new IllegalArgumentException("Cannot set left motor to null. Are you building car?");
+            if (mRightMotor == null)
+                throw new IllegalArgumentException("Cannot set right motor to null. Are you building car?");
+            return new Chassis(this);
+        }
     }
 }

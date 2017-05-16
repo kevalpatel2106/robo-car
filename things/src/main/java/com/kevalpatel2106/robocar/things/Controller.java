@@ -14,13 +14,14 @@
  *  limitations under the License.
  */
 
-package com.kevalpatel2106.robocar.things.chassis;
+package com.kevalpatel2106.robocar.things;
 
 import android.content.Context;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 
 import com.google.android.things.pio.PeripheralManagerService;
+import com.kevalpatel2106.robocar.things.chassis.Chassis;
 import com.kevalpatel2106.robocar.things.radar.ObstacleAlertListener;
 
 /**
@@ -30,10 +31,14 @@ import com.kevalpatel2106.robocar.things.radar.ObstacleAlertListener;
  * @author Keval {https://github.com/kevalpatel2106}
  */
 
-public final class MovementController {
+public final class Controller {
     private Chassis mChassis;   //Car chassis
     private boolean isLockedForObstacle = false;    //Bool to indicate if the external movement control is locked?
 
+    /**
+     * {@link ObstacleAlertListener} to prevent collision with the object using front radar.
+     */
+    @SuppressWarnings("FieldCanBeLocal")
     private ObstacleAlertListener mFrontRadarObstacleListener = new ObstacleAlertListener() {
         @Override
         public void onObstacleDetected() {
@@ -55,11 +60,16 @@ public final class MovementController {
      * Public constructor.
      *
      * @param context instance of caller activity.
-     * @param service {@link PeripheralManagerService}
      */
-    public MovementController(@NonNull Context context,
-                              @NonNull PeripheralManagerService service) {
-        mChassis = new Chassis(context, service, mFrontRadarObstacleListener);
+    public Controller(@NonNull Context context) {
+        PeripheralManagerService service = new PeripheralManagerService();
+        mChassis = new Chassis.Builder()
+                .mountRightMotor(service)
+                .mountLeftMotor(service)
+                .mountFrontRadar(mFrontRadarObstacleListener)
+                .mountBeacon(context)
+                .mountDisplay()
+                .build();
 
         //Reset the motion
         stop();
@@ -107,9 +117,10 @@ public final class MovementController {
     /**
      * Turn off the movement and release the resources.
      */
+    @SuppressWarnings("WeakerAccess")
     public void turnOff() {
         try {
-            mChassis.close();
+            mChassis.turnOff();
         } catch (Exception e) {
             e.printStackTrace();
         }
