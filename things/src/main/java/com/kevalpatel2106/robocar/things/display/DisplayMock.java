@@ -20,6 +20,9 @@ import android.support.annotation.NonNull;
 
 /**
  * Created by Keval on 16-May-17.
+ * This class mocks the display of the robot.
+ *
+ * @author Keval {https://github.com/kevalpatel2106}
  */
 
 abstract class DisplayMock {
@@ -27,9 +30,20 @@ abstract class DisplayMock {
     DisplayMock() {
     }
 
+    /**
+     * Turn on and initialize the display.
+     */
     public abstract void turnOn();
 
+    /**
+     * Write text to the display.
+     *
+     * @param text text to write.
+     */
     public abstract void write(@NonNull String text);
 
+    /**
+     * Turn off the display.
+     */
     public abstract void turnOff();
 }

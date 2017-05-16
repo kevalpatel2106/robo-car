@@ -26,7 +26,7 @@ import com.kevalpatel2106.robocar.things.radar.ObstacleAlertListener;
 
 /**
  * Created by Keval Patel on 14/05/17.
- * This class controls the movement of the robot.
+ * The class that controls the robot.
  *
  * @author Keval {https://github.com/kevalpatel2106}
  */

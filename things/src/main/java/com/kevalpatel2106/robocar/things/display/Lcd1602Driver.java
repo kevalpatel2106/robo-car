@@ -26,6 +26,7 @@ import java.io.IOException;
 /**
  * Inspired from `https://github.com/arduino/Arduino/tree/master/libraries/LiquidCrystal/src`
  *
+ * @author Keval {https://github.com/kevalpatel2106}
  * @see 'https://github.com/Nilhcem/1602A-androidthings'
  */
 final class Lcd1602Driver implements AutoCloseable {
@@ -146,7 +147,7 @@ final class Lcd1602Driver implements AutoCloseable {
      * Lcd1602a constructor is called).
      * </pre>
      */
-    public Lcd1602Driver(boolean fourbitmode, String rs, String rw, String enable, String d0, String d1, String d2, String d3, String d4, String d5, String d6, String d7) throws IOException {
+    Lcd1602Driver(boolean fourbitmode, String rs, String rw, String enable, String d0, String d1, String d2, String d3, String d4, String d5, String d6, String d7) throws IOException {
         PeripheralManagerService pioService = new PeripheralManagerService();
 
         rsGpio = pioService.openGpio(rs);

@@ -25,12 +25,18 @@ import java.io.IOException;
 
 /**
  * Created by Keval on 16-May-17.
+ * Front display.
+ *
+ * @author Keval {https://github.com/kevalpatel2106}
  */
 
 public class Display extends DisplayMock {
-    public static final String TAG = Display.class.getSimpleName();
+    private static final String TAG = Display.class.getSimpleName();
     private Lcd1602Driver mLcd;
 
+    /**
+     * Turn on and initialize the display.
+     */
     @Override
     public void turnOn() {
         try {
@@ -46,6 +52,11 @@ public class Display extends DisplayMock {
         }
     }
 
+    /**
+     * Write text to the display.
+     *
+     * @param text text to write. Make sure that max line length is 16 and you provide maximum 2 lines.
+     */
     @Override
     public void write(@NonNull String text) {
         try {
@@ -68,6 +79,9 @@ public class Display extends DisplayMock {
         }
     }
 
+    /**
+     * Turn off the display.
+     */
     @Override
     public void turnOff() {
         if (mLcd != null) {

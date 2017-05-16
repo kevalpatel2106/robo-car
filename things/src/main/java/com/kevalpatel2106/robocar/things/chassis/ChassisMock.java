@@ -47,28 +47,45 @@ abstract class ChassisMock {
      * Public constructor.
      */
     ChassisMock() {
+        //Do nothing
     }
+
     /**
      * Turn off the components on chassis.
      */
     public abstract void turnOff() throws Exception;
 
+    /**
+     * @return {@link FrontRadar}
+     */
     @Nullable
     public abstract FrontRadar getFrontRadar();
 
-
+    /**
+     * @return {@link RightMotor}
+     */
     @NonNull
     public abstract RightMotor getRightMotor();
 
+    /**
+     * @return {@link LeftMotor}
+     */
     @NonNull
     public abstract LeftMotor getLeftMotor();
 
+    /**
+     * @return {@link Beacon}
+     */
     @Nullable
     public abstract Beacon getBeacon();
 
+    /**
+     * @return {@link Display}
+     */
     @Nullable
     public abstract Display getDisplay();
 
+    @SuppressWarnings("WeakerAccess")
     protected static abstract class BuilderMock {
         /**
          * Mount the front radar. This is an optional component.
@@ -97,6 +114,11 @@ abstract class ChassisMock {
          */
         public abstract BuilderMock mountDisplay();
 
+        /**
+         * Validate and initialize the components.
+         *
+         * @return {@link Chassis}
+         */
         public abstract ChassisMock build();
     }
 }

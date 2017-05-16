@@ -45,30 +45,45 @@ public final class Chassis extends ChassisMock {
         mBuilder = builder;
     }
 
+    /**
+     * @return {@link FrontRadar}
+     */
     @Nullable
     @Override
     public FrontRadar getFrontRadar() {
         return mBuilder.mFrontRadar;
     }
 
+    /**
+     * @return {@link RightMotor}
+     */
     @NonNull
     @Override
     public RightMotor getRightMotor() {
         return mBuilder.mRightMotor;
     }
 
+    /**
+     * @return {@link LeftMotor}
+     */
     @NonNull
     @Override
     public LeftMotor getLeftMotor() {
         return mBuilder.mLeftMotor;
     }
 
+    /**
+     * @return {@link Beacon}
+     */
     @Nullable
     @Override
     public Beacon getBeacon() {
         return mBuilder.mBeacon;
     }
 
+    /**
+     * @return {@link Display}
+     */
     @Nullable
     @Override
     public Display getDisplay() {
@@ -115,7 +130,11 @@ public final class Chassis extends ChassisMock {
         mBuilder.mRightMotor.stop();
     }
 
-
+    /**
+     * Turn off the display and release the resources.
+     *
+     * @throws Exception If releasing resources fail.
+     */
     @Override
     public void turnOff() throws Exception {
         mBuilder.mLeftMotor.close();
@@ -126,6 +145,9 @@ public final class Chassis extends ChassisMock {
         if (mBuilder.mDisplay != null) mBuilder.mDisplay.turnOff();
     }
 
+    /**
+     * Chassis builder. Mount your component to the chassis here.
+     */
     public static class Builder extends ChassisMock.BuilderMock {
 
         @Nullable
@@ -146,6 +168,7 @@ public final class Chassis extends ChassisMock {
         private Display mDisplay;           //Front display
 
         public Builder() {
+            //Do nothing
         }
 
         /**
@@ -196,6 +219,11 @@ public final class Chassis extends ChassisMock {
             return this;
         }
 
+        /**
+         * Validate and initialize the components.
+         *
+         * @return {@link Chassis}
+         */
         @SuppressWarnings("ConstantConditions")
         @Override
         public Chassis build() {
