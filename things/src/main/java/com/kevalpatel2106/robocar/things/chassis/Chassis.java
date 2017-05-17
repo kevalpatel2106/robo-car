@@ -23,6 +23,7 @@ import android.support.annotation.Nullable;
 import com.google.android.things.pio.PeripheralManagerService;
 import com.kevalpatel2106.robocar.things.beacon.Beacon;
 import com.kevalpatel2106.robocar.things.camera.Camera;
+import com.kevalpatel2106.robocar.things.camera.CameraCaptureListener;
 import com.kevalpatel2106.robocar.things.display.LcdDisplay;
 import com.kevalpatel2106.robocar.things.magnetometer.MagnetoMeter;
 import com.kevalpatel2106.robocar.things.motor.LeftMotor;
@@ -248,8 +249,9 @@ public final class Chassis extends ChassisMock {
         }
 
         @Override
-        public BuilderMock mountCamera() {
-            mCamera = new Camera();
+        public BuilderMock mountCamera(@NonNull Context context,
+                                       @NonNull CameraCaptureListener listener) {
+            mCamera = new Camera(context, listener);
             mCamera.turnOn();
             return this;
         }

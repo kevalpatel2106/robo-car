@@ -22,6 +22,7 @@ import android.hardware.usb.UsbManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.WindowManager;
 
 import com.kevalpatel2106.robocar.things.server.WebServer;
 
@@ -35,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         try {
             //Initialize the movement controller

@@ -17,34 +17,26 @@
 package com.kevalpatel2106.robocar.things.camera;
 
 import android.graphics.Bitmap;
+import android.support.annotation.NonNull;
 
 /**
- * Created by Keval Patel on 17/05/17.
+ * Created by Keval on 17-May-17.
+ * Listener to get notify when image is captured.
  *
  * @author Keval {https://github.com/kevalpatel2106}
  */
 
-abstract class CameraMock {
-
-    public abstract void turnOn();
+public interface CameraCaptureListener {
 
     /**
-     * Close the camera resources.
-     */
-    public abstract void turnOff();
-
-    /**
-     * Start capturing the still image. Once image is captured, you can get the bitmap in
-     * {@link CameraCaptureListener}.
+     * Callback to receive when image capture in completed.
      *
-     * @see CameraCaptureListener#onImageCaptured(Bitmap)
+     * @param bitmap Captured {@link Bitmap}
      */
-    public abstract void takePicture();
+    void onImageCaptured(@NonNull Bitmap bitmap);
 
     /**
-     * Check if the cam,era is initialized.
-     *
-     * @return true if the camera in initialized.
+     * Callback to receive when error occurred in image captured.
      */
-    public abstract boolean isCameraInitialized();
+    void onError();
 }

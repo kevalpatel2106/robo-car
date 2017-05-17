@@ -23,6 +23,7 @@ import android.support.annotation.Nullable;
 import com.google.android.things.pio.PeripheralManagerService;
 import com.kevalpatel2106.robocar.things.beacon.Beacon;
 import com.kevalpatel2106.robocar.things.camera.Camera;
+import com.kevalpatel2106.robocar.things.camera.CameraCaptureListener;
 import com.kevalpatel2106.robocar.things.display.LcdDisplay;
 import com.kevalpatel2106.robocar.things.motor.LeftMotor;
 import com.kevalpatel2106.robocar.things.motor.RightMotor;
@@ -130,7 +131,8 @@ abstract class ChassisMock {
         /**
          * Mount the camera. This is an optional component.
          */
-        public abstract BuilderMock mountCamera();
+        public abstract BuilderMock mountCamera(@NonNull Context context,
+                                                @NonNull CameraCaptureListener listener);
 
         /**
          * Mount the magnetometer. This is an optional component.

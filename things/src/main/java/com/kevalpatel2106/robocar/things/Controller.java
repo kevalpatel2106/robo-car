@@ -17,10 +17,12 @@
 package com.kevalpatel2106.robocar.things;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 
 import com.google.android.things.pio.PeripheralManagerService;
+import com.kevalpatel2106.robocar.things.camera.CameraCaptureListener;
 import com.kevalpatel2106.robocar.things.chassis.Chassis;
 import com.kevalpatel2106.robocar.things.radar.ObstacleAlertListener;
 
@@ -31,7 +33,7 @@ import com.kevalpatel2106.robocar.things.radar.ObstacleAlertListener;
  * @author Keval {https://github.com/kevalpatel2106}
  */
 
-public final class Controller {
+public final class Controller implements CameraCaptureListener {
     private Chassis mChassis;   //Car chassis
     private boolean isLockedForObstacle = false;    //Bool to indicate if the external movement control is locked?
 
@@ -127,5 +129,15 @@ public final class Controller {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void onImageCaptured(@NonNull Bitmap bitmap) {
+        //TODO pass the image to the companion app.
+    }
+
+    @Override
+    public void onError() {
+        //TODO handle error.
     }
 }
