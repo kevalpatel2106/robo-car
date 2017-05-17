@@ -16,13 +16,32 @@
 
 <html lang="en">
 <head>
-    <title>Robocar</title>
+    <title>Robot Control</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet"
           href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+    <style>
+        body {
+            font-family: sans-serif;
+            color: #555;
+            background-color: #eee;
+            padding-right: 50px;
+            min-width: 900px;
+        }
+        .container {
+            margin: 10px;
+            border: 0px solid #555;
+            display: table;
+            width:100%;
+            table-layout: fixed;
+            text-align: center;
+       }
+
+
+    </style>
     <script>
         document.onkeydown = checkKey;
         document.onkeyup = stopRobot;
@@ -46,24 +65,31 @@
         function checkKey(e) {
             if (!isCommandSent) {
                 isCommandSent = true
-
                 e = e || window.event;
-                if (e.keyCode == '38') {
-                    // up arrow
-                    var commandStr = baseUrl.concat("forward");
-                    httpGet(commandStr)
-                } else if (e.keyCode == '40') {
-                    // down arrow
-                    var commandStr = baseUrl.concat("reverse");
-                    httpGet(commandStr)
-                } else if (e.keyCode == '37') {
-                    // left arrow
-                    var commandStr = baseUrl.concat("left");
-                    httpGet(commandStr)
-                } else if (e.keyCode == '39') {
-                    // right arrow
-                    var commandStr = baseUrl.concat("right");
-                    httpGet(commandStr)
+                switch (event.keyCode || event.which) {
+                    case 87:
+                    case 38:
+                         // up arrow
+                        var commandStr = baseUrl.concat("forward");
+                        httpGet(commandStr)
+                        break;
+                    case 83:
+                    case 40:
+                         // down arrow
+                        var commandStr = baseUrl.concat("reverse");
+                        httpGet(commandStr)
+                        break;
+                    case 65:
+                    case 37:
+                          // left arrow
+                        var commandStr = baseUrl.concat("left");
+                        httpGet(commandStr)
+                        break;
+                    case 68:
+                    case 39:
+                         var commandStr = baseUrl.concat("right");
+                            httpGet(commandStr)
+                        break;
                 }
             }
         }
@@ -82,34 +108,30 @@
             });
         }
 
+        function send(message) {
+            var commandStr = baseUrl.concat(message);
+            httpGet(commandStr)
+        };
+
     </script>
 </head>
 <body>
 <H1>Robocar Controller</H1>
-<center>
-    <!-- Button -->
-    <div class="row">
-        <div class="col-md-8">
-            <button id="forwardBtn" name="forwardBtn" class="btn btn-primary"> Forward
-            </button>
-        </div>
+<div id="all">
+    <div class="container">
+        <input type="button" value="FORWARD" onclick="send('forward')"/>
     </div>
-
-    <!-- Button (Double) -->
-    <div class="row">
-        <div class="col-md-8">
-            <button id="rightBtn col-md-4" name="rightBtn" class="btn btn-success"> Right</button>
-            <button id="leftBtn col-md-4" name="leftBtn" class="btn btn-danger"> Left</button>
-        </div>
+    <div class="container">
+        <input type="button" style="margin-right:25" value="LEFT" onclick="send('left')"/>
+        <input type="button" value="RIGHT" onclick="send('right')"/>
     </div>
-
-    <!-- Button -->
-    <div class="row">
-        <div class="col-md-8">
-            <button id="reverseBtn" name="reverseBtn" class="btn btn-primary"> Reverse
-            </button>
-        </div>
+    <div class="container">
+        <input type="button" value="BACKWARD" onclick="send('reverse')"/>
     </div>
-</center>
+    <div class="container">
+        <label class="item"><img id="IMG" src=""/> </label>
+        <input type="button" value="TAKE A SHOT" onclick="send('capture')"/>
+    </div>
+</div>
 </body>
 </html>
