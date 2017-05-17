@@ -22,7 +22,7 @@ import android.support.annotation.Nullable;
 
 import com.google.android.things.pio.PeripheralManagerService;
 import com.kevalpatel2106.robocar.things.beacon.Beacon;
-import com.kevalpatel2106.robocar.things.display.Display;
+import com.kevalpatel2106.robocar.things.display.LcdDisplay;
 import com.kevalpatel2106.robocar.things.motor.LeftMotor;
 import com.kevalpatel2106.robocar.things.motor.RightMotor;
 import com.kevalpatel2106.robocar.things.radar.FrontRadar;
@@ -82,12 +82,12 @@ public final class Chassis extends ChassisMock {
     }
 
     /**
-     * @return {@link Display}
+     * @return {@link LcdDisplay}
      */
     @Nullable
     @Override
-    public Display getDisplay() {
-        return mBuilder.mDisplay;
+    public LcdDisplay getLcdDisplay() {
+        return mBuilder.mLcdDisplay;
     }
 
     /**
@@ -142,7 +142,7 @@ public final class Chassis extends ChassisMock {
 
         if (mBuilder.mFrontRadar != null) mBuilder.mFrontRadar.turnOff();
         if (mBuilder.mBeacon != null) mBuilder.mBeacon.stopBeaconTransmission();
-        if (mBuilder.mDisplay != null) mBuilder.mDisplay.turnOff();
+        if (mBuilder.mLcdDisplay != null) mBuilder.mLcdDisplay.turnOff();
     }
 
     /**
@@ -165,7 +165,7 @@ public final class Chassis extends ChassisMock {
         private Beacon mBeacon;           //Alt beacon.
 
         @Nullable
-        private Display mDisplay;           //Front display
+        private LcdDisplay mLcdDisplay;           //Front display
 
         public Builder() {
             //Do nothing
@@ -214,8 +214,8 @@ public final class Chassis extends ChassisMock {
          */
         @Override
         public Builder mountDisplay() {
-            mDisplay = new Display();
-            mDisplay.turnOn();
+            mLcdDisplay = new LcdDisplay();
+            mLcdDisplay.turnOn();
             return this;
         }
 

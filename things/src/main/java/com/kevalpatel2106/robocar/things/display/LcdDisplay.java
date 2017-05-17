@@ -30,9 +30,9 @@ import java.io.IOException;
  * @author Keval {https://github.com/kevalpatel2106}
  */
 
-public class Display extends DisplayMock {
-    private static final String TAG = Display.class.getSimpleName();
-    private Lcd1602Driver mLcd;
+public class LcdDisplay extends DisplayMock {
+    private static final String TAG = LcdDisplay.class.getSimpleName();
+    private LCD1602Driver mLcd;
 
     /**
      * Turn on and initialize the display.
@@ -40,7 +40,7 @@ public class Display extends DisplayMock {
     @Override
     public void turnOn() {
         try {
-            mLcd = new Lcd1602Driver(BoardDefaults.getGPIOForLCDRs(),
+            mLcd = new LCD1602Driver(BoardDefaults.getGPIOForLCDRs(),
                     BoardDefaults.getGPIOForLCDEn(),
                     BoardDefaults.getGPIOForLCDD4(),
                     BoardDefaults.getGPIOForLCDD5(),

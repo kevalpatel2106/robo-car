@@ -37,7 +37,7 @@ import java.util.concurrent.TimeUnit;
  * @see 'https://cdn.sparkfun.com/datasheets/Sensors/Proximity/HCSR04.pdf'
  */
 
-final class Hcsr04 implements AutoCloseable {
+final class HCSR04Driver implements AutoCloseable {
     private static final int INTERVAL_BETWEEN_TRIGGERS = 65;    //Interval between two subsequent pulses
     private static final int TRIG_DURATION_IN_NANO = 10000;     //Trigger pulse duration
     @NonNull
@@ -96,9 +96,9 @@ final class Hcsr04 implements AutoCloseable {
      * @param triggerPin {@link Gpio} for trigger pin.
      * @param listener   {@link DistanceListener} to get distance update  callbacks.
      */
-    Hcsr04(@NonNull Gpio echoPin,
-           @NonNull Gpio triggerPin,
-           @NonNull DistanceListener listener) {
+    HCSR04Driver(@NonNull Gpio echoPin,
+                 @NonNull Gpio triggerPin,
+                 @NonNull DistanceListener listener) {
         try {
             //Set the echo pins
             mEchoPin = echoPin;

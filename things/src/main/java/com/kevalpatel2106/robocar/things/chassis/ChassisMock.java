@@ -22,7 +22,7 @@ import android.support.annotation.Nullable;
 
 import com.google.android.things.pio.PeripheralManagerService;
 import com.kevalpatel2106.robocar.things.beacon.Beacon;
-import com.kevalpatel2106.robocar.things.display.Display;
+import com.kevalpatel2106.robocar.things.display.LcdDisplay;
 import com.kevalpatel2106.robocar.things.motor.LeftMotor;
 import com.kevalpatel2106.robocar.things.motor.RightMotor;
 import com.kevalpatel2106.robocar.things.radar.FrontRadar;
@@ -37,7 +37,7 @@ import com.kevalpatel2106.robocar.things.radar.ObstacleAlertListener;
  * <li>Beacon - Optional</li>
  * <li>Motors - Required</li>
  * <li>Front radar - Optional</li>
- * <li>Display - Optional</li>
+ * <li>LcdDisplay - Optional</li>
  *
  * @author Keval {https://github.com/kevalpatel2106}
  */
@@ -80,10 +80,10 @@ abstract class ChassisMock {
     public abstract Beacon getBeacon();
 
     /**
-     * @return {@link Display}
+     * @return {@link LcdDisplay}
      */
     @Nullable
-    public abstract Display getDisplay();
+    public abstract LcdDisplay getLcdDisplay();
 
     @SuppressWarnings("WeakerAccess")
     protected static abstract class BuilderMock {

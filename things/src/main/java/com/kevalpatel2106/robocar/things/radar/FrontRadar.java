@@ -32,11 +32,11 @@ import java.io.IOException;
  * @author Keval {https://github.com/kevalpatel2106}
  */
 
-public class FrontRadar extends RadarMock implements Hcsr04.DistanceListener {
+public class FrontRadar extends RadarMock implements HCSR04Driver.DistanceListener {
     private static final double DISTANCE_THRASHOLD_IN_CM = 40;
     private ObstacleAlertListener mListener;
 
-    private Hcsr04 mHcsr04;
+    private HCSR04Driver mHCSR04Driver;
 
     /**
      * Public constructor.
@@ -50,7 +50,7 @@ public class FrontRadar extends RadarMock implements Hcsr04.DistanceListener {
             Gpio trigPin = service.openGpio(BoardDefaults.getGPIOForFrontRadarTrig());
             Gpio echoPin = service.openGpio(BoardDefaults.getGPIOForFrontEcho());
 
-            mHcsr04 = new Hcsr04(echoPin, trigPin, this);
+            mHCSR04Driver = new HCSR04Driver(echoPin, trigPin, this);
         } catch (IOException e) {
             e.printStackTrace();
             throw new GpioInitializationException();
@@ -61,17 +61,17 @@ public class FrontRadar extends RadarMock implements Hcsr04.DistanceListener {
 
     @Override
     public void startTransmission() {
-        mHcsr04.startTransmission();
+        mHCSR04Driver.startTransmission();
     }
 
     @Override
     public void stopTransmission() {
-        mHcsr04.stopTransmission();
+        mHCSR04Driver.stopTransmission();
     }
 
     @Override
     public void turnOff() {
-        mHcsr04.close();
+        mHCSR04Driver.close();
     }
 
     /**

@@ -29,7 +29,7 @@ import java.io.IOException;
  * @author Keval {https://github.com/kevalpatel2106}
  * @see 'https://github.com/Nilhcem/1602A-androidthings'
  */
-final class Lcd1602Driver implements AutoCloseable {
+final class LCD1602Driver implements AutoCloseable {
 
     // commands
     private static final int LCD_CLEARDISPLAY = 0x01;
@@ -80,7 +80,7 @@ final class Lcd1602Driver implements AutoCloseable {
 
     private int numlines;
 
-    Lcd1602Driver(String rs,
+    LCD1602Driver(String rs,
                   String rw,
                   String enable,
                   String d0,
@@ -94,7 +94,7 @@ final class Lcd1602Driver implements AutoCloseable {
         this(false, rs, rw, enable, d0, d1, d2, d3, d4, d5, d6, d7);
     }
 
-    Lcd1602Driver(String rs,
+    LCD1602Driver(String rs,
                   String enable,
                   String d0,
                   String d1,
@@ -107,7 +107,7 @@ final class Lcd1602Driver implements AutoCloseable {
         this(false, rs, null, enable, d0, d1, d2, d3, d4, d5, d6, d7);
     }
 
-    Lcd1602Driver(String rs,
+    LCD1602Driver(String rs,
                   String rw,
                   String enable,
                   String d0,
@@ -117,7 +117,7 @@ final class Lcd1602Driver implements AutoCloseable {
         this(true, rs, rw, enable, d0, d1, d2, d3, null, null, null, null);
     }
 
-    Lcd1602Driver(String rs,
+    LCD1602Driver(String rs,
                   String enable,
                   String d0,
                   String d1,
@@ -129,13 +129,13 @@ final class Lcd1602Driver implements AutoCloseable {
     /**
      * <pre>
      * When the display powers up, it is configured as follows:
-     * 1. Display clear
+     * 1. LcdDisplay clear
      * 2. Function set:
      *   DL = 1; 8-bit interface data
      *   N = 0; 1-line display
      *   F = 0; 5x8 dot character font
-     * 3. Display on/off control:
-     *   D = 0; Display off
+     * 3. LcdDisplay on/off control:
+     *   D = 0; LcdDisplay off
      *   C = 0; Cursor off
      *   B = 0; Blinking off
      * 4. Entry mode set:
@@ -147,7 +147,7 @@ final class Lcd1602Driver implements AutoCloseable {
      * Lcd1602a constructor is called).
      * </pre>
      */
-    Lcd1602Driver(boolean fourbitmode, String rs, String rw, String enable, String d0, String d1, String d2, String d3, String d4, String d5, String d6, String d7) throws IOException {
+    LCD1602Driver(boolean fourbitmode, String rs, String rw, String enable, String d0, String d1, String d2, String d3, String d4, String d5, String d6, String d7) throws IOException {
         PeripheralManagerService pioService = new PeripheralManagerService();
 
         rsGpio = pioService.openGpio(rs);
@@ -455,7 +455,7 @@ final class Lcd1602Driver implements AutoCloseable {
         try {
             Thread.sleep(Math.max(1, Math.round(0.001d * microseconds)));
         } catch (InterruptedException e) {
-            Log.e(Lcd1602Driver.class.getSimpleName(), "Sleep error", e);
+            Log.e(LCD1602Driver.class.getSimpleName(), "Sleep error", e);
         }
     }
 }
