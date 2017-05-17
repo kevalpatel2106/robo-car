@@ -32,7 +32,7 @@ import java.io.IOException;
  * @author Keval {https://github.com/kevalpatel2106}
  */
 
-public class FrontRadar extends RadarMock implements HCSR04Driver.DistanceListener {
+public final class FrontRadar extends RadarMock implements HCSR04Driver.DistanceListener {
     private static final double DISTANCE_THRASHOLD_IN_CM = 40;
     private ObstacleAlertListener mListener;
 

@@ -130,16 +130,16 @@ public final class Chassis extends ChassisMock {
      * Move forward. This method is for internal use only.
      */
     public void moveForwardInternal() {
-        mBuilder.mLeftMotor.forward();
-        mBuilder.mRightMotor.forward();
+        mBuilder.mLeftMotor.reverse();
+        mBuilder.mRightMotor.reverse();
     }
 
     /**
      * Move reverse. This method is for internal use only.
      */
     public void moveReverseInternal() {
-        mBuilder.mLeftMotor.reverse();
-        mBuilder.mRightMotor.reverse();
+        mBuilder.mLeftMotor.forward();
+        mBuilder.mRightMotor.forward();
     }
 
     /**

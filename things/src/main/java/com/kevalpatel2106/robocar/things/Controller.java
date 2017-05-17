@@ -42,6 +42,8 @@ public final class Controller {
     private ObstacleAlertListener mFrontRadarObstacleListener = new ObstacleAlertListener() {
         @Override
         public void onObstacleDetected() {
+            if (mChassis == null) return;
+
             isLockedForObstacle = true;     //Lock external movement
 
             mChassis.moveReverseInternal();

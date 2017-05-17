@@ -22,7 +22,7 @@ package com.kevalpatel2106.robocar.things.camera;
  * @author 'https://github.com/kevalpatel2106'
  */
 
-public class Camera extends CameraMock {
+public final class Camera extends CameraMock {
     @Override
     public void turnOn() {
 

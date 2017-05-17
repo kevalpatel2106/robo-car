@@ -30,7 +30,7 @@ import java.util.UUID;
  * Created by cagdas on 24.12.2016.
  */
 
-public class HMC5883LSensorDriver implements AutoCloseable {
+public final class HMC5883LSensorDriver implements AutoCloseable {
 
     private static final String DRIVER_VENDOR = "";
     private static final String DRIVER_NAME = "HMCL5883L";

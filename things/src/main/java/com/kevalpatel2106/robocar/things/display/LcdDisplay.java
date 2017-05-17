@@ -30,7 +30,7 @@ import java.io.IOException;
  * @author Keval {https://github.com/kevalpatel2106}
  */
 
-public class LcdDisplay extends DisplayMock {
+public final class LcdDisplay extends DisplayMock {
     private static final String TAG = LcdDisplay.class.getSimpleName();
     private LCD1602Driver mLcd;
 

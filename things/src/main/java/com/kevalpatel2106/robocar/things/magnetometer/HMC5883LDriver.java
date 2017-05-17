@@ -25,7 +25,7 @@ import java.io.IOException;
  * Created by cagdas on 24.12.2016.
  */
 
-public class HMC5883LDriver implements AutoCloseable {
+public final class HMC5883LDriver implements AutoCloseable {
     private static final int HMC5883L_DEV_ADD = 0x1E;
     private static final int CONFIG_A = 0x00;
     private static final int CONFIG_B = 0x01;
