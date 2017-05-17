@@ -22,7 +22,9 @@ import android.support.annotation.Nullable;
 
 import com.google.android.things.pio.PeripheralManagerService;
 import com.kevalpatel2106.robocar.things.beacon.Beacon;
+import com.kevalpatel2106.robocar.things.camera.Camera;
 import com.kevalpatel2106.robocar.things.display.LcdDisplay;
+import com.kevalpatel2106.robocar.things.magnetometer.MagnetoMeter;
 import com.kevalpatel2106.robocar.things.motor.LeftMotor;
 import com.kevalpatel2106.robocar.things.motor.RightMotor;
 import com.kevalpatel2106.robocar.things.radar.FrontRadar;
@@ -91,6 +93,24 @@ public final class Chassis extends ChassisMock {
     }
 
     /**
+     * @return {@link Camera}
+     */
+    @Nullable
+    @Override
+    public Camera getCamera() {
+        return null;
+    }
+
+    /**
+     * @return {@link com.kevalpatel2106.robocar.things.magnetometer.MagnetoMeter}
+     */
+    @Nullable
+    @Override
+    public LcdDisplay getMagnetoMeter() {
+        return null;
+    }
+
+    /**
      * Take a left turn. This method is for internal use only.
      */
     public void turnLeftInternal() {
@@ -143,6 +163,8 @@ public final class Chassis extends ChassisMock {
         if (mBuilder.mFrontRadar != null) mBuilder.mFrontRadar.turnOff();
         if (mBuilder.mBeacon != null) mBuilder.mBeacon.stopTransmission();
         if (mBuilder.mLcdDisplay != null) mBuilder.mLcdDisplay.turnOff();
+        if (mBuilder.mCamera != null) mBuilder.mCamera.turnOff();
+        if (mBuilder.mMagnetoMeter != null) mBuilder.mMagnetoMeter.turnOff();
     }
 
     /**
@@ -151,21 +173,27 @@ public final class Chassis extends ChassisMock {
     public static class Builder extends ChassisMock.BuilderMock {
 
         @Nullable
-        private FrontRadar mFrontRadar;   //Hcsr04 at the front of the car
+        private FrontRadar mFrontRadar;     //Front radar
 
         @SuppressWarnings("NullableProblems")
         @NonNull
-        private RightMotor mRightMotor;   //Right motor.
+        private RightMotor mRightMotor;     //Right motor.
 
         @SuppressWarnings("NullableProblems")
         @NonNull
-        private LeftMotor mLeftMotor;     //Left side motor
+        private LeftMotor mLeftMotor;       //Left side motor
 
         @Nullable
-        private Beacon mBeacon;           //Alt beacon.
+        private Beacon mBeacon;             //Alt beacon.
 
         @Nullable
-        private LcdDisplay mLcdDisplay;           //Front display
+        private LcdDisplay mLcdDisplay;     //Front display
+
+        @Nullable
+        private Camera mCamera;
+
+        @Nullable
+        private MagnetoMeter mMagnetoMeter; //Magnetometer for getting the direction
 
         public Builder() {
             //Do nothing
@@ -216,6 +244,20 @@ public final class Chassis extends ChassisMock {
         public Builder mountDisplay() {
             mLcdDisplay = new LcdDisplay();
             mLcdDisplay.turnOn();
+            return this;
+        }
+
+        @Override
+        public BuilderMock mountCamera() {
+            mCamera = new Camera();
+            mCamera.turnOn();
+            return this;
+        }
+
+        @Override
+        public BuilderMock mountMagnetometer() {
+            mMagnetoMeter = new MagnetoMeter();
+            mMagnetoMeter.turnOn();
             return this;
         }
 

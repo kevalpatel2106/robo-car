@@ -22,6 +22,7 @@ import android.support.annotation.Nullable;
 
 import com.google.android.things.pio.PeripheralManagerService;
 import com.kevalpatel2106.robocar.things.beacon.Beacon;
+import com.kevalpatel2106.robocar.things.camera.Camera;
 import com.kevalpatel2106.robocar.things.display.LcdDisplay;
 import com.kevalpatel2106.robocar.things.motor.LeftMotor;
 import com.kevalpatel2106.robocar.things.motor.RightMotor;
@@ -85,6 +86,18 @@ abstract class ChassisMock {
     @Nullable
     public abstract LcdDisplay getLcdDisplay();
 
+    /**
+     * @return {@link Camera}
+     */
+    @Nullable
+    public abstract Camera getCamera();
+
+    /**
+     * @return {@link com.kevalpatel2106.robocar.things.magnetometer.MagnetoMeter}
+     */
+    @Nullable
+    public abstract LcdDisplay getMagnetoMeter();
+
     @SuppressWarnings("WeakerAccess")
     protected static abstract class BuilderMock {
         /**
@@ -113,6 +126,16 @@ abstract class ChassisMock {
          * Mount the front display. This is an optional component.
          */
         public abstract BuilderMock mountDisplay();
+
+        /**
+         * Mount the camera. This is an optional component.
+         */
+        public abstract BuilderMock mountCamera();
+
+        /**
+         * Mount the magnetometer. This is an optional component.
+         */
+        public abstract BuilderMock mountMagnetometer();
 
         /**
          * Validate and initialize the components.

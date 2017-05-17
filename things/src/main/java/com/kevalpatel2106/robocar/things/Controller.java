@@ -69,6 +69,7 @@ public final class Controller {
                 .mountFrontRadar(mFrontRadarObstacleListener)
                 .mountBeacon(context)
                 .mountDisplay()
+                //TODO  Mount camera and magnetometer when ready.
                 .build();
 
         //Reset the motion

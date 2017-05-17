@@ -22,7 +22,7 @@ package com.kevalpatel2106.robocar.things.magnetometer;
  * @author 'https://github.com/kevalpatel2106'
  */
 
-abstract class MegnatometerMock {
+abstract class MagnetometerMock {
 
     public abstract void turnOn();
 
