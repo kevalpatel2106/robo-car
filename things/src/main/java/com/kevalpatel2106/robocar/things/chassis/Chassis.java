@@ -141,7 +141,7 @@ public final class Chassis extends ChassisMock {
         mBuilder.mRightMotor.close();
 
         if (mBuilder.mFrontRadar != null) mBuilder.mFrontRadar.turnOff();
-        if (mBuilder.mBeacon != null) mBuilder.mBeacon.stopBeaconTransmission();
+        if (mBuilder.mBeacon != null) mBuilder.mBeacon.stopTransmission();
         if (mBuilder.mLcdDisplay != null) mBuilder.mLcdDisplay.turnOff();
     }
 
@@ -205,7 +205,7 @@ public final class Chassis extends ChassisMock {
         @Override
         public Builder mountBeacon(@NonNull Context context) {
             mBeacon = new Beacon(context);
-            mBeacon.initBeaconTransmission();
+            mBeacon.startTransmission();
             return this;
         }
 

@@ -36,10 +36,9 @@ import java.util.Collections;
  * @see 'https://github.com/AltBeacon/altbeacon-transmitter-android'
  */
 
-public final class Beacon {
+public final class Beacon extends BeaconMock {
     private static final String TAG = Beacon.class.getSimpleName();
 
-    private static final String BEACON_LAYOUT = "m:2-3=beac,i:4-19,i:20-21,i:22-23,p:24-24,d:25-25";
     private static final String BEACON_ID_1 = "2F234454-CF6D-4A0F-ADF2-F4911BA9FFA6";
     private static final String BEACON_ID_2 = "1";
     private static final String BEACON_ID_3 = "2";
@@ -59,13 +58,14 @@ public final class Beacon {
     /**
      * Start transmitting as beacon.
      */
-    public void initBeaconTransmission() {
+    @Override
+    public void startTransmission() {
         if (checkPrerequisites()) {
             // Sets up to transmit as an AltBeacon-style beacon.  If you wish to transmit as a different
             // type of beacon, simply provide a different parser expression.  To find other parser expressions,
             // for other beacon types, do a Google search for "setBeaconLayout" including the quotes
             mBeaconTransmitter = new org.altbeacon.beacon.BeaconTransmitter(mContext,
-                    new BeaconParser().setBeaconLayout(BEACON_LAYOUT));
+                    new BeaconParser().setBeaconLayout(BeaconMock.ALT_BEACON_LAYOUT));
 
             // Transmit a beacon with Identifiers 2F234454-CF6D-4A0F-ADF2-F4911BA9FFA6 1 2
             org.altbeacon.beacon.Beacon beacon = new org.altbeacon.beacon.Beacon.Builder()
@@ -84,7 +84,8 @@ public final class Beacon {
     /**
      * Stop beacon transmission.
      */
-    public void stopBeaconTransmission() {
+    @Override
+    public void stopTransmission() {
         mBeaconTransmitter.stopAdvertising();
     }
 
@@ -93,7 +94,8 @@ public final class Beacon {
      *
      * @return true if the hardware can convert to beacon.
      */
-    private boolean checkPrerequisites() {
+    @Override
+    protected boolean checkPrerequisites() {
         if (!mContext.getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
             Log.e(TAG, "checkPrerequisites: Bluetooth LE not supported by this device");
             return false;
@@ -112,6 +114,16 @@ public final class Beacon {
 
         }
         return true;
+    }
+
+    /**
+     * Check if the beacon is currently transmitting or not?
+     *
+     * @return true if the beacon is currently transmitting.
+     */
+    @Override
+    public boolean isTransmitting() {
+        return mBeaconTransmitter != null && mBeaconTransmitter.isStarted();
     }
 
     /**
