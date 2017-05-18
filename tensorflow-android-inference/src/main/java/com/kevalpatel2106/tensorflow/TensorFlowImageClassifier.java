@@ -54,8 +54,7 @@ public class TensorFlowImageClassifier implements Classifier {
     private static final String OUTPUT_NAME = "output:0";
 
     private static final String MODEL_FILE = "file:///android_asset/tensorflow_inception_graph.pb";
-    private static final String LABEL_FILE =
-            "file:///android_asset/imagenet_comp_graph_label_strings.txt";
+    private static final String LABEL_FILE = "file:///android_asset/imagenet_comp_graph_label_strings.txt";
 
 
     // Only return this many results with at least this confidence.
@@ -138,6 +137,7 @@ public class TensorFlowImageClassifier implements Classifier {
             }
             br.close();
         } catch (IOException ex) {
+            ex.printStackTrace();
             throw new IllegalStateException("Cannot read labels from " + filename);
         }
         return result;

@@ -24,6 +24,16 @@ android {
         minSdkVersion 21
         targetSdkVersion 25
     }
+
+    sourceSets {
+        main {
+            assets.srcDirs = ['./assets']
+        }
+    }
+
+    lintOptions {
+        abortOnError false
+    }
 }
 
 dependencies {

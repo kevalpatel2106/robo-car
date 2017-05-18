@@ -26,6 +26,10 @@ import com.google.android.things.pio.PeripheralManagerService;
 import com.kevalpatel2106.robocar.things.camera.CameraCaptureListener;
 import com.kevalpatel2106.robocar.things.chassis.Chassis;
 import com.kevalpatel2106.robocar.things.radar.ObstacleAlertListener;
+import com.kevalpatel2106.tensorflow.Classifier;
+import com.kevalpatel2106.tensorflow.TensorFlowImageClassifier;
+
+import java.util.List;
 
 /**
  * Created by Keval Patel on 14/05/17.
@@ -35,6 +39,9 @@ import com.kevalpatel2106.robocar.things.radar.ObstacleAlertListener;
  */
 
 public final class Controller implements CameraCaptureListener {
+    private static final String TAG = Controller.class.getSimpleName();
+    @NonNull
+    private final Context mContext;
     private Chassis mChassis;   //Car chassis
     private boolean isLockedForObstacle = false;    //Bool to indicate if the external movement control is locked?
 
@@ -67,6 +74,7 @@ public final class Controller implements CameraCaptureListener {
      * @param context instance of caller activity.
      */
     public Controller(@NonNull Context context) {
+        mContext = context;
         PeripheralManagerService service = new PeripheralManagerService();
         mChassis = new Chassis.Builder()
                 .mountRightMotor(service)
@@ -137,8 +145,16 @@ public final class Controller implements CameraCaptureListener {
 
     @Override
     public void onImageCaptured(@NonNull Bitmap bitmap) {
-        //TODO pass the image to the companion app.
-        Log.d(Controller.class.getSimpleName(), "onImageCaptured: " + bitmap.getByteCount());
+        Log.d(TAG, "onImageCaptured: " + bitmap.getByteCount());
+        processImage(bitmap);
+    }
+
+    private void processImage(@NonNull Bitmap bitmap) {
+        TensorFlowImageClassifier inferenceInterface = new TensorFlowImageClassifier(mContext);
+        List<Classifier.Recognition> results = inferenceInterface.recognizeImage(bitmap);
+
+        for (Classifier.Recognition result : results)
+            Log.d(TAG, "onImageCaptured: Result =>" + result.getTitle() + " " + result.getConfidence());
     }
 
     @Override

@@ -25,6 +25,7 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import java.nio.ByteBuffer;
 
@@ -36,8 +37,7 @@ import java.nio.ByteBuffer;
  */
 
 public final class Camera extends CameraMock implements ImageReader.OnImageAvailableListener {
-    public static final int IMAGE_WIDTH = 320;
-    public static final int IMAGE_HEIGHT = 240;
+    private static final String TAG = Camera.class.getSimpleName();
     private static final String CAMERA_THREAD_NAME = "CameraThread";
     @NonNull
     private final Context mContext;
@@ -123,12 +123,13 @@ public final class Camera extends CameraMock implements ImageReader.OnImageAvail
         final Bitmap bitmap;
         try (Image image = reader.acquireNextImage()) {
             bitmap = imageToBitmap(image);
-            if (bitmap == null) {
+            if (bitmap != null) {
                 mListener.onImageCaptured(bitmap);
+                Log.d(TAG, "onImageAvailable: Byte count:" + bitmap.getByteCount());
             } else {
                 mListener.onError();
+                Log.e(TAG, "onImageAvailable: ImageReader did not returned any byte.");
             }
-            //TODO process image
         }
     }
 

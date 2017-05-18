@@ -30,6 +30,7 @@ import android.hardware.camera2.TotalCaptureResult;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.ImageReader;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.util.Size;
@@ -57,26 +58,23 @@ final class PiCameraDriver {
      */
     private final CameraDevice.StateCallback mStateCallback = new CameraDevice.StateCallback() {
         @Override
-        public void onOpened(CameraDevice cameraDevice) {
-            Log.d(TAG, "Opened camera.");
+        public void onOpened(@NonNull CameraDevice cameraDevice) {
             mCameraDevice = cameraDevice;
         }
 
         @Override
-        public void onDisconnected(CameraDevice cameraDevice) {
-            Log.d(TAG, "Camera disconnected, closing.");
+        public void onDisconnected(@NonNull CameraDevice cameraDevice) {
             cameraDevice.close();
         }
 
         @Override
-        public void onError(CameraDevice cameraDevice, int i) {
+        public void onError(@NonNull CameraDevice cameraDevice, int i) {
             Log.d(TAG, "Camera device error, closing.");
             cameraDevice.close();
         }
 
         @Override
-        public void onClosed(CameraDevice cameraDevice) {
-            Log.d(TAG, "Closed camera, releasing");
+        public void onClosed(@NonNull CameraDevice cameraDevice) {
             mCameraDevice = null;
         }
     };
@@ -88,16 +86,17 @@ final class PiCameraDriver {
             new CameraCaptureSession.CaptureCallback() {
 
                 @Override
-                public void onCaptureProgressed(CameraCaptureSession session,
-                                                CaptureRequest request,
-                                                CaptureResult partialResult) {
+                public void onCaptureProgressed(@NonNull CameraCaptureSession session,
+                                                @NonNull CaptureRequest request,
+                                                @NonNull CaptureResult partialResult) {
                     Log.d(TAG, "Partial result");
                 }
 
                 @Override
-                public void onCaptureCompleted(CameraCaptureSession session,
-                                               CaptureRequest request,
-                                               TotalCaptureResult result) {
+                public void onCaptureCompleted(@NonNull CameraCaptureSession session,
+                                               @NonNull CaptureRequest request,
+                                               @NonNull TotalCaptureResult result) {
+                    //noinspection ConstantConditions
                     if (session != null) {
                         session.close();
                         mCaptureSession = null;
@@ -216,7 +215,7 @@ final class PiCameraDriver {
         // Open the camera resource
         try {
             if (ActivityCompat.checkSelfPermission(context, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                Log.d(TAG, "initializeCamera: Camera permisssion not available.");
+                Log.d(TAG, "initializeCamera: Camera permission not available.");
                 return;
             }
             manager.openCamera(id, mStateCallback, backgroundHandler);
@@ -228,7 +227,7 @@ final class PiCameraDriver {
     /**
      * Begin a still image capture
      */
-    public void takePicture() {
+    void takePicture() {
         if (mCameraDevice == null) {
             Log.w(TAG, "Cannot capture image. Camera not initialized.");
             return;
@@ -254,7 +253,6 @@ final class PiCameraDriver {
                     mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
             captureBuilder.addTarget(mImageReader.getSurface());
             captureBuilder.set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_ON);
-            Log.d(TAG, "Session initialized.");
             mCaptureSession.capture(captureBuilder.build(), mCaptureCallback, null);
         } catch (CameraAccessException cae) {
             Log.d(TAG, "camera capture exception");
@@ -264,10 +262,8 @@ final class PiCameraDriver {
     /**
      * Close the camera resources
      */
-    public void shutDown() {
-        if (mCameraDevice != null) {
-            mCameraDevice.close();
-        }
+    void shutDown() {
+        if (mCameraDevice != null) mCameraDevice.close();
     }
 
     /**
