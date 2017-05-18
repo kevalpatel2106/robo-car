@@ -32,6 +32,7 @@ public class RoboCommands {
     public static final String TURN_RIGHT = "right";
     public static final String MOVE_FORWARD = "forward";
     public static final String MOVE_REVERSE = "reverse";
+    public static final String TAKE_PIC = "capture";
     public static final String STOP = "stop";
 
     @Retention(RetentionPolicy.SOURCE)

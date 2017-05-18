@@ -32,7 +32,9 @@ public class EndPoints {
     //List of endpoint.
     public static final String ENDPOINT_ROOT = "";
     public static final String ENDPOINT_COMMAND = "command";
+    public static final String ENDPOINT_FILE = "file";
 
     //Params name.
     public static final String PARAM_COMMAND = "cmd";
+    public static final String PARAM_FILE = "name";
 }

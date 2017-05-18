@@ -17,6 +17,7 @@
 package com.kevalpatel2106.robocar.things.server;
 
 import android.content.res.AssetManager;
+import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
@@ -24,6 +25,8 @@ import com.kevalpatel2106.common.EndPoints;
 import com.kevalpatel2106.common.RoboCommands;
 import com.kevalpatel2106.robocar.things.Controller;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
@@ -93,11 +96,30 @@ public final class WebServer extends NanoHTTPD {
                             case RoboCommands.TURN_LEFT:
                                 mController.turnLeft();
                                 return newFixedLengthResponse("{\"s\":\"Ok\"}");
+                            case RoboCommands.TAKE_PIC:
+                                //TODO take pic command.
+                                return getHTMLResponse("home.html");
                             case RoboCommands.STOP:
                                 mController.stop();
                                 return newFixedLengthResponse("{\"s\":\"Ok\"}");
                         }
                         break;
+                    case "/" + EndPoints.ENDPOINT_FILE:
+                        params = session.getParms();
+                        FileInputStream fis = null;
+                        try {
+                            Log.d(TAG, "serve: File name = " + params.get(EndPoints.PARAM_COMMAND));
+
+                            fis = new FileInputStream(Environment.getExternalStorageDirectory()
+                                    + "/" + params.get(EndPoints.PARAM_FILE));
+                            return newChunkedResponse(Response.Status.OK, "image/jpg", fis);
+                        } catch (FileNotFoundException e) {
+                            e.printStackTrace();
+                            return newFixedLengthResponse("");
+                        } finally {
+                            if (fis != null) fis.close();
+                        }
+                    case "/" + EndPoints.ENDPOINT_ROOT:
                     default:    //Load up the website.
                         return getHTMLResponse("home.html");
                 }
