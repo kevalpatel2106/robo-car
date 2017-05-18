@@ -14,4 +14,4 @@
  *  limitations under the License.
  */
 
-include ':mobile', ':things', ':common'
+include ':mobile', ':things', ':common', ':tensorflow-android-inference'

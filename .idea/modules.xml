@@ -5,6 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/common/common.iml" filepath="$PROJECT_DIR$/common/common.iml" />
       <module fileurl="file://$PROJECT_DIR$/mobile/mobile.iml" filepath="$PROJECT_DIR$/mobile/mobile.iml" />
       <module fileurl="file://$PROJECT_DIR$/robo-car.iml" filepath="$PROJECT_DIR$/robo-car.iml" />
+      <module fileurl="file://$PROJECT_DIR$/tensorflow-android-inference/tensorflow-android-inference.iml" filepath="$PROJECT_DIR$/tensorflow-android-inference/tensorflow-android-inference.iml" />
       <module fileurl="file://$PROJECT_DIR$/things/things.iml" filepath="$PROJECT_DIR$/things/things.iml" />
     </modules>
   </component>
