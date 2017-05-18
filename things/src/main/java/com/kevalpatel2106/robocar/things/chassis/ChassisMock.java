@@ -25,6 +25,7 @@ import com.kevalpatel2106.robocar.things.beacon.Beacon;
 import com.kevalpatel2106.robocar.things.camera.Camera;
 import com.kevalpatel2106.robocar.things.camera.CameraCaptureListener;
 import com.kevalpatel2106.robocar.things.display.LcdDisplay;
+import com.kevalpatel2106.robocar.things.magnetometer.MagnetoMeter;
 import com.kevalpatel2106.robocar.things.motor.LeftMotor;
 import com.kevalpatel2106.robocar.things.motor.RightMotor;
 import com.kevalpatel2106.robocar.things.radar.FrontRadar;
@@ -97,7 +98,7 @@ abstract class ChassisMock {
      * @return {@link com.kevalpatel2106.robocar.things.magnetometer.MagnetoMeter}
      */
     @Nullable
-    public abstract LcdDisplay getMagnetoMeter();
+    public abstract MagnetoMeter getMagnetoMeter();
 
     @SuppressWarnings("WeakerAccess")
     protected static abstract class BuilderMock {

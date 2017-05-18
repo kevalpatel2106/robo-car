@@ -81,7 +81,7 @@ public final class WebServer extends NanoHTTPD {
                     case "/" + EndPoints.ENDPOINT_COMMAND:    //Command to control the robot
                         Map<String, String> params = session.getParms();
 
-                        Log.d(TAG, "serve: New command = " + params.get(EndPoints.PARAM_COMMAND));
+//                        Log.d(TAG, "serve: New command = " + params.get(EndPoints.PARAM_COMMAND));
 
                         switch (params.get(EndPoints.PARAM_COMMAND)) {
                             case RoboCommands.MOVE_FORWARD:
@@ -97,8 +97,9 @@ public final class WebServer extends NanoHTTPD {
                                 mController.turnLeft();
                                 return newFixedLengthResponse("{\"s\":\"Ok\"}");
                             case RoboCommands.TAKE_PIC:
-                                //TODO take pic command.
-                                return getHTMLResponse("home.html");
+                                Log.d(TAG, "serve: New command = " + params.get(EndPoints.PARAM_COMMAND));
+                                mController.captureImage();
+                                return newFixedLengthResponse("{\"s\":\"Ok\"}");
                             case RoboCommands.STOP:
                                 mController.stop();
                                 return newFixedLengthResponse("{\"s\":\"Ok\"}");

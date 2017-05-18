@@ -20,6 +20,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.google.android.things.pio.PeripheralManagerService;
 import com.kevalpatel2106.robocar.things.camera.CameraCaptureListener;
@@ -72,8 +73,7 @@ public final class Controller implements CameraCaptureListener {
                 .mountLeftMotor(service)
                 .mountFrontRadar(mFrontRadarObstacleListener)
                 .mountBeacon(context)
-                .mountDisplay()
-                //TODO  Mount camera and magnetometer when ready.
+                .mountCamera(context, this)
                 .build();
 
         //Reset the motion
@@ -119,6 +119,10 @@ public final class Controller implements CameraCaptureListener {
         mChassis.stopInternal();
     }
 
+    public void captureImage() {
+        if (mChassis.getCamera() != null) mChassis.getCamera().takePicture();
+    }
+
     /**
      * Turn off the movement and release the resources.
      */
@@ -134,6 +138,7 @@ public final class Controller implements CameraCaptureListener {
     @Override
     public void onImageCaptured(@NonNull Bitmap bitmap) {
         //TODO pass the image to the companion app.
+        Log.d(Controller.class.getSimpleName(), "onImageCaptured: " + bitmap.getByteCount());
     }
 
     @Override

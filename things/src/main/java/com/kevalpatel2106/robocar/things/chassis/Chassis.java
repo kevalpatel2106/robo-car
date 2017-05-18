@@ -99,7 +99,7 @@ public final class Chassis extends ChassisMock {
     @Nullable
     @Override
     public Camera getCamera() {
-        return null;
+        return mBuilder.mCamera;
     }
 
     /**
@@ -107,8 +107,8 @@ public final class Chassis extends ChassisMock {
      */
     @Nullable
     @Override
-    public LcdDisplay getMagnetoMeter() {
-        return null;
+    public MagnetoMeter getMagnetoMeter() {
+        return mBuilder.mMagnetoMeter;
     }
 
     /**
@@ -249,15 +249,15 @@ public final class Chassis extends ChassisMock {
         }
 
         @Override
-        public BuilderMock mountCamera(@NonNull Context context,
-                                       @NonNull CameraCaptureListener listener) {
+        public Builder mountCamera(@NonNull Context context,
+                                   @NonNull CameraCaptureListener listener) {
             mCamera = new Camera(context, listener);
             mCamera.turnOn();
             return this;
         }
 
         @Override
-        public BuilderMock mountMagnetometer() {
+        public Builder mountMagnetometer() {
             mMagnetoMeter = new MagnetoMeter();
             mMagnetoMeter.turnOn();
             return this;

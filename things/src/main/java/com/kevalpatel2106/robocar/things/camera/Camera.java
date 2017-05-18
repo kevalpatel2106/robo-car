@@ -67,15 +67,11 @@ public final class Camera extends CameraMock implements ImageReader.OnImageAvail
 
         mBackgroundThread = new HandlerThread(CAMERA_THREAD_NAME);
         mBackgroundThread.start();
-
         mBackgroundHandler = new Handler(mBackgroundThread.getLooper());
-        mBackgroundHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                mPiCamera = PiCameraDriver.getInstance();
-                mPiCamera.initializeCamera(mContext, mBackgroundHandler, Camera.this);
-            }
-        });
+
+        //Initialize the camera.
+        mPiCamera = PiCameraDriver.getInstance();
+        mPiCamera.initializeCamera(mContext, mBackgroundHandler, Camera.this);
     }
 
     /**
@@ -84,8 +80,8 @@ public final class Camera extends CameraMock implements ImageReader.OnImageAvail
     @Override
     public void turnOff() {
         try {
-            if (mBackgroundThread != null) mBackgroundThread.quit();
             if (mPiCamera != null) mPiCamera.shutDown();
+            if (mBackgroundThread != null) mBackgroundThread.quit();
         } catch (Throwable t) {
             t.printStackTrace();
         } finally {
@@ -112,7 +108,7 @@ public final class Camera extends CameraMock implements ImageReader.OnImageAvail
      */
     @Override
     public boolean isCameraInitialized() {
-        return mPiCamera != null && mPiCamera.isInitialized();
+        return mPiCamera != null;
     }
 
     /**
