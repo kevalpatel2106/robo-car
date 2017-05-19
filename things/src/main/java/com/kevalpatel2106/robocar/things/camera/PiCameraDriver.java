@@ -53,6 +53,7 @@ final class PiCameraDriver {
     private static final int MAX_IMAGES = 1;
 
     private CameraDevice mCameraDevice;
+
     /**
      * Callback handling device state changes
      */
@@ -78,7 +79,9 @@ final class PiCameraDriver {
             mCameraDevice = null;
         }
     };
+
     private CameraCaptureSession mCaptureSession;
+
     /**
      * Callback handling capture session events
      */
@@ -188,10 +191,11 @@ final class PiCameraDriver {
     /**
      * Initialize the camera device
      */
-    public void initializeCamera(Context context,
-                                 Handler backgroundHandler,
-                                 ImageReader.OnImageAvailableListener imageAvailableListener) {
+    void initializeCamera(Context context,
+                          Handler backgroundHandler,
+                          ImageReader.OnImageAvailableListener imageAvailableListener) {
         mBackgroundHandler = backgroundHandler;
+
         // Discover the camera instance
         CameraManager manager = (CameraManager) context.getSystemService(CAMERA_SERVICE);
         String[] camIds = {};

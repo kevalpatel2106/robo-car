@@ -27,6 +27,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 
 /**
@@ -125,6 +127,8 @@ public final class Camera extends CameraMock implements ImageReader.OnImageAvail
             bitmap = imageToBitmap(image);
             if (bitmap != null) {
                 mListener.onImageCaptured(bitmap);
+
+                saveBitmap(bitmap, mContext.getExternalCacheDir().getAbsolutePath() + "/" + System.currentTimeMillis() + ".jpg");
                 Log.d(TAG, "onImageAvailable: Byte count:" + bitmap.getByteCount());
             } else {
                 mListener.onError();
@@ -145,5 +149,30 @@ public final class Camera extends CameraMock implements ImageReader.OnImageAvail
         byte[] bytes = new byte[buffer.capacity()];
         buffer.get(bytes);
         return BitmapFactory.decodeByteArray(bytes, 0, bytes.length, null);
+    }
+
+    private void saveBitmap(Bitmap bitmap, String path) {
+        if (bitmap != null) {
+            try {
+                FileOutputStream outputStream = null;
+                try {
+                    outputStream = new FileOutputStream(path); //here is set your file path where you want to save or also here you can set file object directly
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream); // bitmap is your Bitmap instance, if you want to compress it you can compress reduce percentage
+                    // PNG is a lossless format, the compression factor (100) is ignored
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    try {
+                        if (outputStream != null) {
+                            outputStream.close();
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

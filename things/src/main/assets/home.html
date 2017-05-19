@@ -39,7 +39,43 @@
             table-layout: fixed;
             text-align: center;
        }
+        .video-container {
+            box-sizing: border-box;
+            margin-top: -35px;
+        }
 
+        div.video-player  {
+            position: relative;
+            margin-top: 15px;
+            margin-left: 30px;
+        }
+        img.video-player  {
+            position: absolute;
+            margin-top: 35px;
+            width: 640px;
+            height: 360px;
+        }
+        canvas.video-player {
+            background: black;
+            position: absolute;
+            margin-top: 35px;
+            width: 480px;
+            height: 290px;
+            left: 68px;
+            top: 35px;
+        }
+
+        .video-controls {
+            text-align: center;
+            margin-top: 400px;
+        }
+
+        .span-info {
+            color: #555555;
+            font-size: small;
+            margin-top: 2px;
+            margin-bottom: 2px;
+        }
 
     </style>
     <script>
@@ -129,10 +165,15 @@
         <input type="button" value="BACKWARD" onclick="send('reverse')"/>
     </div>
     <div class="container">
-        <label class="item"><img id="IMG" src=""/></label>
+        <label class="video-player"><img id="IMG" src=""/></label>
         <input type="button" value="TAKE A SHOT" onclick="send('capture')"/>
     </div>
-
+    <!--<div class="video-container">-->
+    <!--<div class="video-player">-->
+    <!--<img src="img/phone.png" class="video-player" />-->
+    <!--<canvas width="640px" height="360px" class="video-player" id="videoPlayer"></canvas>-->
+    <!--</div>-->
+    <!--</div>-->
 </div>
 </body>
 </html>
