@@ -14,4 +14,14 @@
  *  limitations under the License.
  */
 
-include ':things', ':tensorflow-android-inference', ':libstreaming'
+package net.majorkernelpanic.streaming.exceptions;
+
+public class InvalidSurfaceException extends RuntimeException {
+
+    private static final long serialVersionUID = -7238661340093544496L;
+
+    public InvalidSurfaceException(String message) {
+        super(message);
+    }
+
+}
