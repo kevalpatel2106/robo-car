@@ -17,21 +17,21 @@
 package com.kevalpatel2106.robocar.things.server;
 
 import android.content.res.AssetManager;
-import android.os.Environment;
+import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
+import android.util.Base64;
 import android.util.Log;
 
-import com.kevalpatel2106.common.EndPoints;
-import com.kevalpatel2106.common.RoboCommands;
 import com.kevalpatel2106.robocar.things.Controller;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Map;
 
+import fi.iki.elonen.IWebSocketFactory;
 import fi.iki.elonen.NanoHTTPD;
+import fi.iki.elonen.WebSocket;
+import fi.iki.elonen.WebSocketResponseHandler;
 
 /**
  * Created by Keval Patel on 14/05/17.
@@ -42,7 +42,7 @@ import fi.iki.elonen.NanoHTTPD;
  * @see 'https://github.com/NanoHttpd/nanohttpd'
  */
 
-public final class WebServer extends NanoHTTPD {
+public final class WebServer extends NanoHTTPD implements CommandSender {
     private static final String TAG = WebServer.class.getSimpleName();
 
     @NonNull
@@ -50,23 +50,41 @@ public final class WebServer extends NanoHTTPD {
     @NonNull
     private final AssetManager mAssetManager;
 
+    private Socket mSocket;
+
+    private WebSocketResponseHandler mResponseHandler;
+
+
     /**
      * Start the web server.
      *
-     * @param controller {@link Controller} to control the movement.
-     * @param assetManager       {@link AssetManager} to load html wepages from assets.
+     * @param controller   {@link Controller} to control the movement.
+     * @param assetManager {@link AssetManager} to load html wepages from assets.
      * @throws IOException If failed to initialize.
      */
     public WebServer(@NonNull Controller controller,
                      @NonNull AssetManager assetManager) throws IOException {
         super(8080);
-
         mController = controller;
         mAssetManager = assetManager;
 
+        //Create socket
+        mResponseHandler = new WebSocketResponseHandler(new IWebSocketFactory() {
+
+            @Override
+            public WebSocket openWebSocket(IHTTPSession handshake) {
+                mSocket = new Socket(handshake, mController);
+                return mSocket;
+            }
+        });
+
         //Start the server
-        start(NanoHTTPD.SOCKET_READ_TIMEOUT, false);
+        start();
         Log.d(TAG, "WebServer: Starting server.");
+    }
+
+    public CommandSender getListner() {
+        return this;
     }
 
     /**
@@ -74,60 +92,16 @@ public final class WebServer extends NanoHTTPD {
      */
     @Override
     public Response serve(IHTTPSession session) {
-        if (session.getMethod() == Method.GET) {
-
+        NanoHTTPD.Response ws = mResponseHandler.serve(session);
+        if (ws == null) {
+            String uri = session.getUri();
             try {
-                switch (session.getUri()) {
-                    case "/" + EndPoints.ENDPOINT_COMMAND:    //Command to control the robot
-                        Map<String, String> params = session.getParms();
-
-                        Log.d(TAG, "serve: New command = " + params.get(EndPoints.PARAM_COMMAND));
-
-                        switch (params.get(EndPoints.PARAM_COMMAND)) {
-                            case RoboCommands.MOVE_FORWARD:
-                                mController.moveForward();
-                                return newFixedLengthResponse("{\"s\":\"Ok\"}");
-                            case RoboCommands.MOVE_REVERSE:
-                                mController.moveReverse();
-                                return newFixedLengthResponse("{\"s\":\"Ok\"}");
-                            case RoboCommands.TURN_RIGHT:
-                                mController.turnRight();
-                                return newFixedLengthResponse("{\"s\":\"Ok\"}");
-                            case RoboCommands.TURN_LEFT:
-                                mController.turnLeft();
-                                return newFixedLengthResponse("{\"s\":\"Ok\"}");
-                            case RoboCommands.TAKE_PIC:
-                                mController.captureImage();
-                                return newFixedLengthResponse("{\"s\":\"Ok\"}");
-                            case RoboCommands.STOP:
-                                mController.stop();
-                                return newFixedLengthResponse("{\"s\":\"Ok\"}");
-                        }
-                        break;
-                    case "/" + EndPoints.ENDPOINT_FILE:
-                        params = session.getParms();
-                        FileInputStream fis = null;
-                        try {
-                            Log.d(TAG, "serve: File name = " + params.get(EndPoints.PARAM_COMMAND));
-
-                            fis = new FileInputStream(Environment.getExternalStorageDirectory()
-                                    + "/" + params.get(EndPoints.PARAM_FILE));
-                            return newChunkedResponse(Response.Status.OK, "image/jpg", fis);
-                        } catch (FileNotFoundException e) {
-                            e.printStackTrace();
-                            return newFixedLengthResponse("");
-                        } finally {
-                            if (fis != null) fis.close();
-                        }
-                    case "/" + EndPoints.ENDPOINT_ROOT:
-                    default:    //Load up the website.
-                        return getHTMLResponse("home.html");
-                }
-            } catch (IOException e) {
+                if (uri.equals("/")) return getHTMLResponse("home.html");
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-        return newFixedLengthResponse("{\"s\":\"Failed\"}");
+        return ws;
     }
 
     /**
@@ -140,6 +114,29 @@ public final class WebServer extends NanoHTTPD {
     @NonNull
     private Response getHTMLResponse(@NonNull String assetName) throws IOException {
         InputStream inputStream = mAssetManager.open(assetName);
-        return newFixedLengthResponse(Response.Status.OK, "text/html", inputStream, inputStream.available());
+        return new NanoHTTPD.Response(Response.Status.OK, "text/html", inputStream);
+    }
+
+    @Override
+    public void sendImage(Bitmap msg) {
+        try {
+            if (mSocket != null) {
+                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                msg.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
+                byte[] byteArray = byteArrayOutputStream.toByteArray();
+                mSocket.send("data:image/png;base64," + Base64.encodeToString(byteArray, Base64.DEFAULT));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void sendMessage(String msg) {
+        try {
+            if (mSocket != null) mSocket.send(msg);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

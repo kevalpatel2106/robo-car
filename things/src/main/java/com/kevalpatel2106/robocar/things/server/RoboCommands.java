@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-package com.kevalpatel2106.common;
+package com.kevalpatel2106.robocar.things.server;
 
 import android.support.annotation.StringDef;
 
@@ -27,16 +27,16 @@ import java.lang.annotation.RetentionPolicy;
  * @author 'https://github.com/kevalpatel2106'
  */
 
-public class RoboCommands {
-    public static final String TURN_LEFT = "left";
-    public static final String TURN_RIGHT = "right";
-    public static final String MOVE_FORWARD = "forward";
-    public static final String MOVE_REVERSE = "reverse";
-    public static final String TAKE_PIC = "capture";
-    public static final String STOP = "stop";
+class RoboCommands {
+    static final String TURN_LEFT = "left";
+    static final String TURN_RIGHT = "right";
+    static final String MOVE_FORWARD = "forward";
+    static final String MOVE_REVERSE = "reverse";
+    static final String TAKE_PIC = "capture";
+    static final String STOP = "stop";
 
     @Retention(RetentionPolicy.SOURCE)
     @StringDef({TURN_LEFT, TURN_RIGHT, MOVE_FORWARD, MOVE_REVERSE, STOP})
-    public @interface Command {
+    @interface Command {
     }
 }

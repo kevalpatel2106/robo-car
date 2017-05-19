@@ -79,76 +79,66 @@
 
     </style>
     <script>
+        console.log("robotWebUi.js : server IP= "+document.location.host);
+        var sock = new WebSocket('ws://' + document.location.host, "protocolOne");
+
+        sock.onopen = function (event) {
+             console.log("I am connected to server.....");
+            //document.getElementById("connection").value = 'CONNECTED';
+        };
+
+        sock.onmessage = function (event) {
+            console.log("on message" + event.data);
+            document.getElementById('IMG').setAttribute( 'src', event.data );
+        }
+
+        sock.onerror = function (error) {
+            console.log('WebSocket Error',  error);
+        };
+
+        function send(message) {
+            console.log('WebSocket try to send',  message);
+            sock.send(message);
+        };
+
         document.onkeydown = checkKey;
         document.onkeyup = stopRobot;
 
-        var baseUrl = "http://192.168.0.106:8080/command?cmd="
-        var isCommandSent = false
-
-        var HttpClient = function() {
-            this.get = function(aUrl, aCallback) {
-                var anHttpRequest = new XMLHttpRequest();
-                anHttpRequest.onreadystatechange = function() {
-                    if (anHttpRequest.readyState == 4 && anHttpRequest.status == 200)
-                        aCallback(anHttpRequest.responseText);
-                }
-
-                anHttpRequest.open("GET", aUrl, true);
-                anHttpRequest.send(null);
-            }
-        }
-
+        var isCommandSent = false;
         function checkKey(e) {
-            if (!isCommandSent) {
-                isCommandSent = true
-                e = e || window.event;
-                switch (event.keyCode || event.which) {
-                    case 87:
-                    case 38:
-                         // up arrow
-                        var commandStr = baseUrl.concat("forward");
-                        httpGet(commandStr)
-                        break;
-                    case 83:
-                    case 40:
-                         // down arrow
-                        var commandStr = baseUrl.concat("reverse");
-                        httpGet(commandStr)
-                        break;
-                    case 65:
-                    case 37:
-                          // left arrow
-                        var commandStr = baseUrl.concat("left");
-                        httpGet(commandStr)
-                        break;
-                    case 68:
-                    case 39:
-                         var commandStr = baseUrl.concat("right");
-                            httpGet(commandStr)
-                        break;
+                if (!isCommandSent){
+                    isCommandSent = true;
+                    e = e || window.event;
+                    switch (event.keyCode || event.which) {
+                        case 87:
+                        case 38:
+                             // up arrow
+                            send("forward");
+                            break;
+                        case 83:
+                        case 40:
+                             // down arrow
+                           send("reverse");
+                            break;
+                        case 65:
+                        case 37:
+                              // left arrow
+                            send("left");
+                            break;
+                        case 68:
+                        case 39:
+                             send("right");
+                            break;
+                    }
                 }
-            }
         }
 
         function stopRobot(e) {
-            var commandStr = baseUrl.concat("stop");
-            httpGet(commandStr)
-            isCommandSent = false
+            if (isCommandSent){
+                send("stop");
+                isCommandSent = false;
+            }
         }
-
-        function httpGet(theUrl) {
-            console.log(theUrl);
-            var client = new HttpClient();
-            client.get(theUrl, function(response) {
-                console.log(response);
-            });
-        }
-
-        function send(message) {
-            var commandStr = baseUrl.concat(message);
-            httpGet(commandStr)
-        };
-
     </script>
 </head>
 <body>
@@ -165,8 +155,10 @@
         <input type="button" value="BACKWARD" onclick="send('reverse')"/>
     </div>
     <div class="container">
-        <label class="video-player"><img id="IMG" src=""/></label>
         <input type="button" value="TAKE A SHOT" onclick="send('capture')"/>
+    </div>
+    <div class="container">
+        <label class="item"><img id="IMG" src=""/></label>
     </div>
     <!--<div class="video-container">-->
     <!--<div class="video-player">-->

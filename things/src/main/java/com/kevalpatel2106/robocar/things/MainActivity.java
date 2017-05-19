@@ -16,18 +16,13 @@
 
 package com.kevalpatel2106.robocar.things;
 
-import android.hardware.usb.UsbDevice;
-import android.hardware.usb.UsbDeviceConnection;
-import android.hardware.usb.UsbManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.WindowManager;
 
 import com.kevalpatel2106.robocar.things.server.WebServer;
 
 import java.io.IOException;
-import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -41,30 +36,17 @@ public class MainActivity extends AppCompatActivity {
         try {
             //Initialize the movement controller
             mController = new Controller(this);
+            mController.setCommandSender(new WebServer(mController, getAssets()));
 
             //Start the web server
-            new WebServer(mController, getAssets());
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        listAllUSB();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         mController.turnOff();
-    }
-
-    private void listAllUSB() {
-        UsbManager usbManager = getSystemService(UsbManager.class);
-        Map<String, UsbDevice> connectedDevices = usbManager.getDeviceList();
-        for (UsbDevice device : connectedDevices.values()) {
-            Log.i(TAG, "Device found: " + device.getDeviceName());
-            UsbDeviceConnection connection = usbManager.openDevice(device);
-            //TODO
-            break;
-        }
     }
 }

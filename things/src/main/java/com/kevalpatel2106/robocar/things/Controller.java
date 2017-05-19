@@ -26,9 +26,12 @@ import com.google.android.things.pio.PeripheralManagerService;
 import com.kevalpatel2106.robocar.things.camera.CameraCaptureListener;
 import com.kevalpatel2106.robocar.things.chassis.Chassis;
 import com.kevalpatel2106.robocar.things.radar.ObstacleAlertListener;
+import com.kevalpatel2106.robocar.things.server.CommandSender;
+import com.kevalpatel2106.robocar.things.server.WebServer;
 import com.kevalpatel2106.tensorflow.Classifier;
 import com.kevalpatel2106.tensorflow.TensorFlowImageClassifier;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -42,7 +45,10 @@ public final class Controller implements CameraCaptureListener {
     private static final String TAG = Controller.class.getSimpleName();
     @NonNull
     private final Context mContext;
-    private Chassis mChassis;   //Car chassis
+    private final Chassis mChassis;                       //Car chassis
+
+    private CommandSender mCommandSender;
+
     private boolean isLockedForObstacle = false;    //Bool to indicate if the external movement control is locked?
 
     /**
@@ -86,6 +92,10 @@ public final class Controller implements CameraCaptureListener {
 
         //Reset the motion
         stop();
+    }
+
+    public void setCommandSender(WebServer server) {
+        mCommandSender = server.getListner();
     }
 
     /**
@@ -146,6 +156,11 @@ public final class Controller implements CameraCaptureListener {
     @Override
     public void onImageCaptured(@NonNull Bitmap bitmap) {
         Log.d(TAG, "onImageCaptured: " + bitmap.getByteCount());
+        try {
+            mCommandSender.sendImage(bitmap);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         processImage(bitmap);
     }
 
