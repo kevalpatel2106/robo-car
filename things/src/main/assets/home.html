@@ -134,10 +134,8 @@
         }
 
         function stopRobot(e) {
-            if (isCommandSent){
-                send("stop");
-                isCommandSent = false;
-            }
+            send("stop");
+            isCommandSent = false;
         }
     </script>
 </head>

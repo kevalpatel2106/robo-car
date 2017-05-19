@@ -151,7 +151,7 @@ public final class Camera extends CameraMock implements ImageReader.OnImageAvail
         return BitmapFactory.decodeByteArray(bytes, 0, bytes.length, null);
     }
 
-    private void saveBitmap(Bitmap bitmap, String path) {
+    private void saveBitmap(@Nullable Bitmap bitmap, @NonNull String path) {
         if (bitmap != null) {
             try {
                 FileOutputStream outputStream = null;

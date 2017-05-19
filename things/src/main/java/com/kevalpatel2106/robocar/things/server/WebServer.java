@@ -51,7 +51,6 @@ public final class WebServer extends NanoHTTPD implements CommandSender {
     private final AssetManager mAssetManager;
 
     private Socket mSocket;
-
     private WebSocketResponseHandler mResponseHandler;
 
 

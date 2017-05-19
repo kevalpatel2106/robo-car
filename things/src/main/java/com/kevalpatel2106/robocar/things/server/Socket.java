@@ -50,21 +50,27 @@ class Socket extends WebSocket {
     @Override
     protected void onMessage(WebSocketFrame webSocketFrame) {
         String command = webSocketFrame.getTextPayload();
-        Log.d(TAG, "onMessage: WebSocket Command" + command);
+        Log.d(TAG, "onMessage: WebSocket Command ->" + command);
 
         switch (command) {
             case RoboCommands.MOVE_FORWARD:
                 mController.moveForward();
+                break;
             case RoboCommands.MOVE_REVERSE:
                 mController.moveReverse();
+                break;
             case RoboCommands.TURN_RIGHT:
                 mController.turnRight();
+                break;
             case RoboCommands.TURN_LEFT:
                 mController.turnLeft();
+                break;
             case RoboCommands.TAKE_PIC:
                 mController.captureImage();
+                break;
             case RoboCommands.STOP:
                 mController.stop();
+                break;
         }
     }
 

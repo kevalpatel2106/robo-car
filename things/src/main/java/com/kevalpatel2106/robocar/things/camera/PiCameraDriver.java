@@ -48,8 +48,8 @@ final class PiCameraDriver {
     private static final String TAG = PiCameraDriver.class.getSimpleName();
 
 
-    private static final int IMAGE_WIDTH = 320;
-    private static final int IMAGE_HEIGHT = 240;
+    private static final int IMAGE_WIDTH = 2560;
+    private static final int IMAGE_HEIGHT = 1920;
     private static final int MAX_IMAGES = 1;
 
     private CameraDevice mCameraDevice;
@@ -118,11 +118,12 @@ final class PiCameraDriver {
     private CameraCaptureSession.StateCallback mSessionCallback =
             new CameraCaptureSession.StateCallback() {
                 @Override
-                public void onConfigured(CameraCaptureSession cameraCaptureSession) {
+                public void onConfigured(@NonNull CameraCaptureSession cameraCaptureSession) {
                     // The camera is already closed
                     if (mCameraDevice == null) {
                         return;
                     }
+                    Log.d(TAG, "onConfigured: Taking image");
 
                     // When the session is ready, we start capture.
                     mCaptureSession = cameraCaptureSession;
@@ -130,8 +131,9 @@ final class PiCameraDriver {
                 }
 
                 @Override
-                public void onConfigureFailed(CameraCaptureSession cameraCaptureSession) {
+                public void onConfigureFailed(@NonNull CameraCaptureSession cameraCaptureSession) {
                     Log.w(TAG, "Failed to configure camera");
+                    cameraCaptureSession.close();
                 }
             };
 
@@ -212,8 +214,7 @@ final class PiCameraDriver {
         Log.d(TAG, "Using camera id " + id);
 
         // Initialize the image processor
-        mImageReader = ImageReader.newInstance(IMAGE_WIDTH, IMAGE_HEIGHT,
-                ImageFormat.JPEG, MAX_IMAGES);
+        mImageReader = ImageReader.newInstance(IMAGE_WIDTH, IMAGE_HEIGHT, ImageFormat.JPEG, MAX_IMAGES);
         mImageReader.setOnImageAvailableListener(imageAvailableListener, backgroundHandler);
 
         // Open the camera resource
@@ -243,6 +244,8 @@ final class PiCameraDriver {
                     Collections.singletonList(mImageReader.getSurface()),
                     mSessionCallback,
                     mBackgroundHandler);
+
+            Log.d(TAG, "takePicture: Image Captured.");
         } catch (CameraAccessException cae) {
             Log.d(TAG, "access exception while preparing pic", cae);
         }
@@ -257,7 +260,7 @@ final class PiCameraDriver {
                     mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
             captureBuilder.addTarget(mImageReader.getSurface());
             captureBuilder.set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_ON);
-            mCaptureSession.capture(captureBuilder.build(), mCaptureCallback, null);
+            mCaptureSession.capture(captureBuilder.build(), mCaptureCallback, mBackgroundHandler);
         } catch (CameraAccessException cae) {
             Log.d(TAG, "camera capture exception");
         }
