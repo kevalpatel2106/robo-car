@@ -32,7 +32,6 @@ android {
 dependencies {
     compile files('libs/nanoHttpd.jar')
     compile project(':tensorflow-android-inference')
-    compile project(':libstreaming')
 
     provided 'com.google.android.things:androidthings:0.3-devpreview'
 
@@ -41,6 +40,10 @@ dependencies {
 
     //Beacon library
     compile 'org.altbeacon:android-beacon-library:2.9.2'
+
+    compile 'io.reactivex.rxjava2:rxjava:2.0.6'
+    compile 'io.reactivex.rxjava2:rxandroid:2.0.1'
+
     //Open cv
     //    compile 'org.bytedeco.javacpp-presets:opencv-platform:3.2.0-1.3'
 }

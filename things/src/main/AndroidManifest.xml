@@ -27,7 +27,9 @@
 
     <uses-feature android:name="android.hardware.camera"/>
     <uses-feature android:name="android.hardware.camera.autofocus"/>
+
     <application
+        android:largeHeap="true"
         android:theme="@style/Theme.AppCompat.Light.DarkActionBar"
         tools:ignore="AllowBackup,GoogleAppIndexingWarning,MissingApplicationIcon">
 

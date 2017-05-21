@@ -14,4 +14,4 @@
  *  limitations under the License.
  */
 
-include ':things', ':tensorflow-android-inference', ':libstreaming'
+include ':things', ':tensorflow-android-inference'

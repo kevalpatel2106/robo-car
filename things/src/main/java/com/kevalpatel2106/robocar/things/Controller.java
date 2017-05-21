@@ -33,6 +33,14 @@ import com.kevalpatel2106.tensorflow.TensorFlowImageClassifier;
 
 import java.util.List;
 
+import io.reactivex.BackpressureStrategy;
+import io.reactivex.Flowable;
+import io.reactivex.FlowableEmitter;
+import io.reactivex.FlowableOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
+
 /**
  * Created by Keval Patel on 14/05/17.
  * The class that controls the robot.
@@ -42,9 +50,8 @@ import java.util.List;
 
 public final class Controller implements CameraCaptureListener {
     private static final String TAG = Controller.class.getSimpleName();
-    @NonNull
-    private final Context mContext;
     private final Chassis mChassis;                       //Car chassis
+    private final TensorFlowImageClassifier mTfInterface;
 
     private CommandSender mCommandSender;
 
@@ -72,6 +79,16 @@ public final class Controller implements CameraCaptureListener {
             }, 400);
         }
     };
+    private Consumer<List<Classifier.Recognition>> mTfProcessorObserver = new Consumer<List<Classifier.Recognition>>() {
+        @Override
+        public void accept(@io.reactivex.annotations.NonNull List<Classifier.Recognition> recognitions) throws Exception {
+            String resultStr = "";
+            for (Classifier.Recognition result : recognitions) {
+                resultStr = resultStr + result.getTitle() + " " + result.getConfidence() + "<br/>";
+                mCommandSender.sendMessage(resultStr);
+            }
+        }
+    };
 
     /**
      * Public constructor.
@@ -79,7 +96,9 @@ public final class Controller implements CameraCaptureListener {
      * @param context instance of caller activity.
      */
     public Controller(@NonNull Context context) {
-        mContext = context;
+        mTfInterface = new TensorFlowImageClassifier(context);
+
+        //Build chassis.
         PeripheralManagerService service = new PeripheralManagerService();
         mChassis = new Chassis.Builder()
                 .mountRightMotor(service)
@@ -94,7 +113,7 @@ public final class Controller implements CameraCaptureListener {
     }
 
     public void setCommandSender(WebServer server) {
-        mCommandSender = server.getListner();
+        mCommandSender = server.getListener();
     }
 
     /**
@@ -137,6 +156,7 @@ public final class Controller implements CameraCaptureListener {
     }
 
     public void captureImage() {
+        Log.d(TAG, "captureImage: Captured " + System.currentTimeMillis());
         if (mChassis.getCamera() != null) mChassis.getCamera().takePicture();
     }
 
@@ -154,18 +174,23 @@ public final class Controller implements CameraCaptureListener {
 
     @Override
     public void onImageCaptured(@NonNull Bitmap bitmap) {
-        Log.d(TAG, "onImageCaptured: " + bitmap.getByteCount());
         mCommandSender.sendImage(bitmap);
-
+        processImage(bitmap);
         captureImage();
     }
 
-    private void processImage(@NonNull Bitmap bitmap) {
-        TensorFlowImageClassifier inferenceInterface = new TensorFlowImageClassifier(mContext);
-        List<Classifier.Recognition> results = inferenceInterface.recognizeImage(bitmap);
+    private void processImage(@NonNull final Bitmap bitmap) {
+        Flowable<List<Classifier.Recognition>> observable = Flowable
+                .create(new FlowableOnSubscribe<List<Classifier.Recognition>>() {
+                    @Override
+                    public void subscribe(FlowableEmitter<List<Classifier.Recognition>> emitter) throws Exception {
+                        emitter.onNext(mTfInterface.recognizeImage(bitmap));
+                    }
+                }, BackpressureStrategy.MISSING);
 
-        for (Classifier.Recognition result : results)
-            Log.d(TAG, "onImageCaptured: Result =>" + result.getTitle() + " " + result.getConfidence());
+        observable.observeOn(Schedulers.io())
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .subscribe(mTfProcessorObserver);
     }
 
     @Override

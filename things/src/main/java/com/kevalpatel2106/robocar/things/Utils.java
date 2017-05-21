@@ -33,6 +33,7 @@ import java.nio.ByteBuffer;
  */
 
 public class Utils {
+
     /**
      * Convert the {@link Image} to {@link Bitmap}.
      *
@@ -44,7 +45,10 @@ public class Utils {
         ByteBuffer buffer = image.getPlanes()[0].getBuffer();
         byte[] bytes = new byte[buffer.capacity()];
         buffer.get(bytes);
-        return BitmapFactory.decodeByteArray(bytes, 0, bytes.length, null);
+
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inPreferredConfig = Bitmap.Config.RGB_565;
+        return BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
     }
 
     public static void saveBitmap(@Nullable Bitmap bitmap, @NonNull String path) {

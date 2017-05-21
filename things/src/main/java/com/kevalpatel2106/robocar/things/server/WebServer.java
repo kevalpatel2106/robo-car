@@ -82,7 +82,7 @@ public final class WebServer extends NanoHTTPD implements CommandSender {
         Log.d(TAG, "WebServer: Starting server.");
     }
 
-    public CommandSender getListner() {
+    public CommandSender getListener() {
         return this;
     }
 
@@ -119,21 +119,21 @@ public final class WebServer extends NanoHTTPD implements CommandSender {
     @Override
     public void sendImage(Bitmap msg) {
         try {
-            if (mSocket != null) {
-                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                msg.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
-                byte[] byteArray = byteArrayOutputStream.toByteArray();
-                mSocket.send("data:image/png;base64," + Base64.encodeToString(byteArray, Base64.DEFAULT));
-            }
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            msg.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+            byte[] byteArray = byteArrayOutputStream.toByteArray();
+            sendMessage("data:image/png;base64," + Base64.encodeToString(byteArray, Base64.DEFAULT));
+            byteArrayOutputStream.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     @Override
-    public void sendMessage(String msg) {
+    public synchronized void sendMessage(final String msg) {
+        if (msg == null || mSocket == null) return;
         try {
-            if (mSocket != null) mSocket.send(msg);
+            mSocket.send(msg);
         } catch (IOException e) {
             e.printStackTrace();
         }

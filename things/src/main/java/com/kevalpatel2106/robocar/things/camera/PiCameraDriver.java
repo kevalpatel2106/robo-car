@@ -48,8 +48,8 @@ final class PiCameraDriver {
     private static final String TAG = PiCameraDriver.class.getSimpleName();
 
     //5MP resolution
-    private static final int IMAGE_WIDTH = 320;
-    private static final int IMAGE_HEIGHT = 240;
+    private static final int IMAGE_WIDTH = 480;
+    private static final int IMAGE_HEIGHT = 320;
     private static final int MAX_IMAGES = 1;
 
     private CameraDevice mCameraDevice;
@@ -123,7 +123,6 @@ final class PiCameraDriver {
                     if (mCameraDevice == null) {
                         return;
                     }
-                    Log.d(TAG, "onConfigured: Taking image");
 
                     // When the session is ready, we start capture.
                     mCaptureSession = cameraCaptureSession;

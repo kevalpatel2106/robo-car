@@ -89,7 +89,12 @@
 
         sock.onmessage = function (event) {
             console.log("on message" + event.data);
-            document.getElementById('IMG').setAttribute( 'src', event.data );
+            substring = "data:image/png;base64";
+            if (event.data.indexOf(substring) !== -1){
+                document.getElementById('IMG').setAttribute( 'src', event.data );
+            }else{
+                 document.getElementById('TEXT').innerHTML = event.data;
+            }
         }
 
         sock.onerror = function (error) {
@@ -153,17 +158,14 @@
         <input type="button" value="BACKWARD" onclick="send('reverse')"/>
     </div>
     <div class="container">
-        <input type="button" value="TAKE A SHOT" onclick="send('capture')"/>
+        <input type="button" value="START VIDEO" onclick="send('capture')"/>
     </div>
     <div class="container">
         <label class="item"><img id="IMG" src=""/></label>
     </div>
-    <!--<div class="video-container">-->
-    <!--<div class="video-player">-->
-    <!--<img src="img/phone.png" class="video-player" />-->
-    <!--<canvas width="640px" height="360px" class="video-player" id="videoPlayer"></canvas>-->
-    <!--</div>-->
-    <!--</div>-->
+    <div class="container">
+        <p id="TEXT"></p>
+    </div>
 </div>
 </body>
 </html>

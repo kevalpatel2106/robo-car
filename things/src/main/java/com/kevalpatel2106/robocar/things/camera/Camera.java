@@ -42,7 +42,7 @@ public final class Camera extends CameraMock implements ImageReader.OnImageAvail
     private CameraCaptureListener mListener;
 
     private Handler mBackgroundHandler;
-    private HandlerThread mBackgroundThread;    //Background thread to capture and process captured image.
+    private HandlerThread mCameraThread;    //Background thread to capture and process captured image.
     private PiCameraDriver mPiCamera;           //Pi camera.
 
     /**
@@ -63,9 +63,9 @@ public final class Camera extends CameraMock implements ImageReader.OnImageAvail
     public void turnOn() {
         if (mBackgroundHandler != null) turnOff();
 
-        mBackgroundThread = new HandlerThread(CAMERA_THREAD_NAME);
-        mBackgroundThread.start();
-        mBackgroundHandler = new Handler(mBackgroundThread.getLooper());
+        mCameraThread = new HandlerThread(CAMERA_THREAD_NAME);
+        mCameraThread.start();
+        mBackgroundHandler = new Handler(mCameraThread.getLooper());
 
         //Initialize the camera.
         mPiCamera = PiCameraDriver.getInstance();
@@ -79,17 +79,17 @@ public final class Camera extends CameraMock implements ImageReader.OnImageAvail
     public void turnOff() {
         try {
             if (mPiCamera != null) mPiCamera.shutDown();
-            if (mBackgroundThread != null) mBackgroundThread.quit();
+            if (mCameraThread != null) mCameraThread.quit();
         } catch (Throwable t) {
             t.printStackTrace();
         } finally {
-            mBackgroundThread = null;
+            mCameraThread = null;
             mBackgroundHandler = null;
         }
     }
 
     /**
-     * Start capturing the still image. Once image is captured, you can get the bitmap in
+     * Start capturing the still image. Once image is captured, you can get the sOutBitmap in
      * {@link CameraCaptureListener}.
      *
      * @see CameraCaptureListener#onImageCaptured(Bitmap)
@@ -110,20 +110,21 @@ public final class Camera extends CameraMock implements ImageReader.OnImageAvail
     }
 
     /**
-     * Get the bitmap image from the camera. This runs on the background thread.
+     * Get the sOutBitmap image from the camera. This runs on the background thread.
+     * This function works on the {@link Camera#mCameraThread}.
      *
      * @param reader {@link ImageReader}
      * @see ImageReader.OnImageAvailableListener
      */
     @Override
     public void onImageAvailable(ImageReader reader) {
-        //Get the image in bitmap.
-        final Bitmap bitmap;
+        //Get the image in sOutBitmap.
         try (Image image = reader.acquireNextImage()) {
-            bitmap = Utils.imageToBitmap(image);
-            if (bitmap != null) {
-                mListener.onImageCaptured(bitmap);
-                Log.d(TAG, "onImageAvailable: Byte count:" + bitmap.getByteCount());
+            Bitmap sOutBitmap = Utils.imageToBitmap(image);
+            image.close();
+
+            if (sOutBitmap != null) {
+                mListener.onImageCaptured(sOutBitmap);
             } else {
                 mListener.onError();
                 Log.e(TAG, "onImageAvailable: ImageReader did not returned any byte.");

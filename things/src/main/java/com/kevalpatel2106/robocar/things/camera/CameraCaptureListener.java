@@ -18,6 +18,7 @@ package com.kevalpatel2106.robocar.things.camera;
 
 import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
+import android.support.annotation.WorkerThread;
 
 /**
  * Created by Keval on 17-May-17.
@@ -29,14 +30,16 @@ import android.support.annotation.NonNull;
 public interface CameraCaptureListener {
 
     /**
-     * Callback to receive when image capture in completed.
+     * Callback to receive when image capture in completed. This function works on the {@link Camera#mCameraThread}.
      *
      * @param bitmap Captured {@link Bitmap}
      */
+    @WorkerThread
     void onImageCaptured(@NonNull Bitmap bitmap);
 
     /**
-     * Callback to receive when error occurred in image captured.
+     * Callback to receive when error occurred in image captured. This function works on the {@link Camera#mCameraThread}.
      */
+    @WorkerThread
     void onError();
 }

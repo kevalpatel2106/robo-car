@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/libstreaming/libstreaming.iml" filepath="$PROJECT_DIR$/libstreaming/libstreaming.iml" />
       <module fileurl="file://$PROJECT_DIR$/robo-car.iml" filepath="$PROJECT_DIR$/robo-car.iml" />
       <module fileurl="file://$PROJECT_DIR$/tensorflow-android-inference/tensorflow-android-inference.iml" filepath="$PROJECT_DIR$/tensorflow-android-inference/tensorflow-android-inference.iml" />
       <module fileurl="file://$PROJECT_DIR$/things/things.iml" filepath="$PROJECT_DIR$/things/things.iml" />

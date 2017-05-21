@@ -27,17 +27,21 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.PriorityQueue;
 
 /**
  * A classifier specialized to label images using TensorFlow.
  */
 public class TensorFlowImageClassifier implements Classifier {
-
-    public static final int INPUT_SIZE = 224;
-
+    // These are the settings for the original v1 Inception model. If you want to
+    // use a model that's been produced from the TensorFlow for Poets codelab,
+    // you'll need to set IMAGE_SIZE = 299, IMAGE_MEAN = 128, IMAGE_STD = 128,
+    // INPUT_NAME = "Mul:0", and OUTPUT_NAME = "final_result:0".
+    // You'll also need to update the MODEL_FILE and LABEL_FILE paths to point to
+    // the ones you produced.
+    private static final int INPUT_SIZE = 224;
 
     // These are the settings for the original v1 Inception model. If you want to
     // use a model that's been produced from the TensorFlow for Poets codelab,
@@ -76,6 +80,13 @@ public class TensorFlowImageClassifier implements Classifier {
     private int[] intValues;
 
     private TensorFlowInferenceInterface inferenceInterface;
+    private Comparator<Recognition> mConfidenceComparator = new Comparator<Recognition>() {
+        @Override
+        public int compare(Recognition lhs, Recognition rhs) {
+            // Intentionally reversed to put high confidence at the head of the queue.
+            return Float.compare(rhs.getConfidence(), lhs.getConfidence());
+        }
+    };
 
     /**
      * Initializes a native TensorFlow session for classifying images.
@@ -171,25 +182,16 @@ public class TensorFlowImageClassifier implements Classifier {
         inferenceInterface.readNodeFloat(outputName, outputs);
 
         // Find the best classifications.
-        PriorityQueue<Recognition> pq = new PriorityQueue<Recognition>(3,
-                new Comparator<Recognition>() {
-                    @Override
-                    public int compare(Recognition lhs, Recognition rhs) {
-                        // Intentionally reversed to put high confidence at the head of the queue.
-                        return Float.compare(rhs.getConfidence(), lhs.getConfidence());
-                    }
-                });
+        ArrayList<Recognition> recognitions = new ArrayList<>();
         for (int i = 0; i < outputs.length; ++i) {
             if (outputs[i] > THRESHOLD) {
-                pq.add(new Recognition("" + i, labels.get(i), outputs[i], null));
+                recognitions.add(new Recognition("" + i, labels.get(i), outputs[i], null));
             }
         }
-        ArrayList<Recognition> recognitions = new ArrayList<Recognition>();
-        int recognitionsSize = Math.min(pq.size(), MAX_RESULTS);
-        for (int i = 0; i < recognitionsSize; ++i) {
-            recognitions.add(pq.poll());
-        }
-        return recognitions;
+
+        Collections.sort(recognitions, mConfidenceComparator);
+        int recognitionsSize = Math.min(recognitions.size(), MAX_RESULTS);
+        return recognitions.subList(0, recognitionsSize - 1);
     }
 
     @Override
