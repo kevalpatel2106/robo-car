@@ -31,7 +31,6 @@ import com.kevalpatel2106.robocar.things.server.WebServer;
 import com.kevalpatel2106.tensorflow.Classifier;
 import com.kevalpatel2106.tensorflow.TensorFlowImageClassifier;
 
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -156,12 +155,9 @@ public final class Controller implements CameraCaptureListener {
     @Override
     public void onImageCaptured(@NonNull Bitmap bitmap) {
         Log.d(TAG, "onImageCaptured: " + bitmap.getByteCount());
-        try {
-            mCommandSender.sendImage(bitmap);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        processImage(bitmap);
+        mCommandSender.sendImage(bitmap);
+
+        captureImage();
     }
 
     private void processImage(@NonNull Bitmap bitmap) {

@@ -252,6 +252,8 @@ public class RtspServer extends Service {
     @Override
     public void onCreate() {
 
+        Log.d(TAG, "onCreate: RSTP");
+
         // Let's restore the state of the service
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         mPort = Integer.parseInt(mSharedPreferences.getString(KEY_PORT, String.valueOf(mPort)));

@@ -18,15 +18,13 @@ package com.kevalpatel2106.robocar.things.server;
 
 import android.graphics.Bitmap;
 
-import java.io.IOException;
-
 /**
  * Created by Keval on 19-May-17.
  */
 
 public interface CommandSender {
 
-    void sendImage(Bitmap image) throws IOException;
+    void sendImage(Bitmap image);
 
     void sendMessage(String msg);
 }

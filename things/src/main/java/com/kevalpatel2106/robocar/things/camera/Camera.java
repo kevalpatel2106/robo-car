@@ -18,18 +18,14 @@ package com.kevalpatel2106.robocar.things.camera;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.media.Image;
 import android.media.ImageReader;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.ByteBuffer;
+import com.kevalpatel2106.robocar.things.Utils;
 
 /**
  * Created by Keval Patel on 17/05/17.
@@ -124,54 +120,13 @@ public final class Camera extends CameraMock implements ImageReader.OnImageAvail
         //Get the image in bitmap.
         final Bitmap bitmap;
         try (Image image = reader.acquireNextImage()) {
-            bitmap = imageToBitmap(image);
+            bitmap = Utils.imageToBitmap(image);
             if (bitmap != null) {
                 mListener.onImageCaptured(bitmap);
-
-                saveBitmap(bitmap, mContext.getExternalCacheDir().getAbsolutePath() + "/" + System.currentTimeMillis() + ".jpg");
                 Log.d(TAG, "onImageAvailable: Byte count:" + bitmap.getByteCount());
             } else {
                 mListener.onError();
                 Log.e(TAG, "onImageAvailable: ImageReader did not returned any byte.");
-            }
-        }
-    }
-
-    /**
-     * Convert the {@link Image} to {@link Bitmap}.
-     *
-     * @param image image to convert
-     * @return {@link Bitmap}
-     */
-    @Nullable
-    private Bitmap imageToBitmap(@NonNull Image image) {
-        ByteBuffer buffer = image.getPlanes()[0].getBuffer();
-        byte[] bytes = new byte[buffer.capacity()];
-        buffer.get(bytes);
-        return BitmapFactory.decodeByteArray(bytes, 0, bytes.length, null);
-    }
-
-    private void saveBitmap(@Nullable Bitmap bitmap, @NonNull String path) {
-        if (bitmap != null) {
-            try {
-                FileOutputStream outputStream = null;
-                try {
-                    outputStream = new FileOutputStream(path); //here is set your file path where you want to save or also here you can set file object directly
-                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream); // bitmap is your Bitmap instance, if you want to compress it you can compress reduce percentage
-                    // PNG is a lossless format, the compression factor (100) is ignored
-                } catch (Exception e) {
-                    e.printStackTrace();
-                } finally {
-                    try {
-                        if (outputStream != null) {
-                            outputStream.close();
-                        }
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
             }
         }
     }

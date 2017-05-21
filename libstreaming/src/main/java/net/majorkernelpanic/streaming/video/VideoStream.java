@@ -585,7 +585,7 @@ public abstract class VideoStream extends MediaStream {
         if (mSurfaceView == null)
             throw new InvalidSurfaceException("Invalid surface !");
         if (mSurfaceView.getHolder() == null || !mSurfaceReady)
-            throw new InvalidSurfaceException("Invalid surface !");
+            throw new InvalidSurfaceException("Invalid surface 111!");
 
         if (mCamera == null) {
             openCamera();
@@ -636,6 +636,8 @@ public abstract class VideoStream extends MediaStream {
                 throw e;
             }
 
+            Log.d(TAG, "createCamera: Camera is open.");
+
         }
     }
 
@@ -679,7 +681,7 @@ public abstract class VideoStream extends MediaStream {
 
         try {
             mCamera.setParameters(parameters);
-            mCamera.setDisplayOrientation(mOrientation);
+            mCamera.setDisplayOrientation(90);
             mCamera.startPreview();
             mPreviewStarted = true;
             mUpdated = true;
