@@ -33,8 +33,8 @@ import fi.iki.elonen.WebSocketFrame;
 
 class Socket extends WebSocket {
     private static final String TAG = Socket.class.getSimpleName();
-    private final Controller mController;
 
+    private final Controller mController;
 
     Socket(@NonNull NanoHTTPD.IHTTPSession handshakeRequest,
            @NonNull Controller controller) {

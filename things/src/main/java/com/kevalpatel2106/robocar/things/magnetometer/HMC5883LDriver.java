@@ -25,7 +25,7 @@ import java.io.IOException;
  * Created by cagdas on 24.12.2016.
  */
 
-public final class HMC5883LDriver implements AutoCloseable {
+final class HMC5883LDriver implements AutoCloseable {
     private static final int HMC5883L_DEV_ADD = 0x1E;
     private static final int CONFIG_A = 0x00;
     private static final int CONFIG_B = 0x01;
@@ -87,7 +87,7 @@ public final class HMC5883LDriver implements AutoCloseable {
 
     private I2cDevice mDevice;
 
-    public HMC5883LDriver(String bus) throws IOException {
+    HMC5883LDriver(String bus) throws IOException {
         PeripheralManagerService peripheralManagerService = new PeripheralManagerService();
         I2cDevice device = peripheralManagerService.openI2cDevice(bus, HMC5883L_DEV_ADD);
         try {
@@ -118,12 +118,12 @@ public final class HMC5883LDriver implements AutoCloseable {
         setOperationMode(OPERATION_MODE_CONT);
     }
 
-    public int getSamplesAvarage() throws IOException {
+    int getSamplesAvarage() throws IOException {
         int value = this.mDevice.readRegByte(CONFIG_A) & 0xff;
         return (int) ((value >> SAMPLES_AVARAGE_START) % Math.pow(2, SAMPLES_AVARAGE_LENGTH));
     }
 
-    public void setSamplesAvarage(int avarage) throws IOException {
+    void setSamplesAvarage(int avarage) throws IOException {
         int value = this.mDevice.readRegByte(CONFIG_A) & 0xff;
         int bits = 1;
         int i = 0;
@@ -145,12 +145,12 @@ public final class HMC5883LDriver implements AutoCloseable {
         this.mDevice.writeRegByte(CONFIG_A, (byte) value);
     }
 
-    public int getOutputRate() throws IOException {
+    int getOutputRate() throws IOException {
         int value = this.mDevice.readRegByte(CONFIG_A) & 0xff;
         return (int) ((value >> OUTPUT_RATE_START) % Math.pow(2, OUTPUT_RATE_LENGTH));
     }
 
-    public void setOutputRate(int rate) throws IOException {
+    void setOutputRate(int rate) throws IOException {
         int value = this.mDevice.readRegByte(CONFIG_A) & 0xff;
         int bits = 1;
         int i = 0;
@@ -180,12 +180,12 @@ public final class HMC5883LDriver implements AutoCloseable {
         this.mDevice.writeRegByte(CONFIG_A, (byte) value);
     }
 
-    public int getMeasurementMode() throws IOException {
+    int getMeasurementMode() throws IOException {
         int value = this.mDevice.readRegByte(CONFIG_A) & 0xff;
         return (int) ((value >> MEASUREMENT_START) % Math.pow(2, MEASUREMENT_LENGTH));
     }
 
-    public void setMeasurementMode(int mode) throws IOException {
+    void setMeasurementMode(int mode) throws IOException {
         int value = this.mDevice.readRegByte(CONFIG_A) & 0xff;
         int bits = 1;
         int i = 0;
@@ -205,12 +205,12 @@ public final class HMC5883LDriver implements AutoCloseable {
         this.mDevice.writeRegByte(CONFIG_A, (byte) value);
     }
 
-    public int getMeasurementGain() throws IOException {
+    int getMeasurementGain() throws IOException {
         int value = this.mDevice.readRegByte(CONFIG_B) & 0xff;
         return (int) ((value >> GAIN_START) % Math.pow(2, GAIN_LENGTH));
     }
 
-    public void setMeasurementGain(int gain) throws IOException {
+    void setMeasurementGain(int gain) throws IOException {
         if (gain == 0) {
             this.mDevice.writeRegByte(CONFIG_B, (byte) (GAIN_1370 << 5));
         } else if (gain == 1) {
@@ -230,12 +230,12 @@ public final class HMC5883LDriver implements AutoCloseable {
         }
     }
 
-    public int getOperationMode() throws IOException {
+    int getOperationMode() throws IOException {
         int value = this.mDevice.readRegByte(MODE_REG) & 0xff;
         return (int) ((value >> OPERATION_MODE_START) % Math.pow(2, OPERATION_MODE_LENGTH));
     }
 
-    public void setOperationMode(int mode) throws IOException {
+    void setOperationMode(int mode) throws IOException {
         if (mode == 0) {
             this.mDevice.writeRegByte(MODE_REG, (byte) OPERATION_MODE_CONT);
         } else if (mode == 1) {
@@ -245,28 +245,28 @@ public final class HMC5883LDriver implements AutoCloseable {
         }
     }
 
-    public int getMagnitudeX() throws IOException {
+    int getMagnitudeX() throws IOException {
         int lsb = this.mDevice.readRegByte(X_LOW) & 0xff;
         int msb = this.mDevice.readRegByte(X_HIGH);
 
         return (msb << 8 | lsb);
     }
 
-    public int getMagnitudeY() throws IOException {
+    int getMagnitudeY() throws IOException {
         int lsb = this.mDevice.readRegByte(Y_LOW) & 0xff;
         int msb = this.mDevice.readRegByte(Y_HIGH);
 
         return (msb << 8 | lsb);
     }
 
-    public int getMagnitudeZ() throws IOException {
+    int getMagnitudeZ() throws IOException {
         int lsb = this.mDevice.readRegByte(Z_LOW) & 0xff;
         int msb = this.mDevice.readRegByte(Z_HIGH);
 
         return (msb << 8 | lsb);
     }
 
-    public float[] getMagnitudes() throws IOException {
+    float[] getMagnitudes() throws IOException {
         float[] values = new float[3];
         values[0] = getMagnitudeX();
         values[1] = getMagnitudeY();

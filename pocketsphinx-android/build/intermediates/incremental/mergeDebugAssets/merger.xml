@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merger version="3"><dataSet config="main"><source path="F:\Proj\robo-car\pocketsphinx-android\assets"/><source path="F:\Proj\robo-car\pocketsphinx-android\build\generated\assets\shaders\debug"/></dataSet><dataSet config="debug"><source path="F:\Proj\robo-car\pocketsphinx-android\src\debug\assets"/></dataSet></merger>

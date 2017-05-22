@@ -30,7 +30,7 @@ import java.util.UUID;
  * Created by cagdas on 24.12.2016.
  */
 
-public final class HMC5883LSensorDriver implements AutoCloseable {
+final class HMC5883LSensorDriver implements AutoCloseable {
 
     private static final String DRIVER_VENDOR = "";
     private static final String DRIVER_NAME = "HMCL5883L";
@@ -50,7 +50,7 @@ public final class HMC5883LSensorDriver implements AutoCloseable {
         hmcl5883l = new HMC5883LDriver(bus);
     }
 
-    public void registerMagmetormeterSensor() {
+    void registerMagmetormeterSensor() {
         if (hmcl5883l == null) {
             throw new IllegalStateException("cannot register closed driver");
         }
@@ -61,7 +61,7 @@ public final class HMC5883LSensorDriver implements AutoCloseable {
         }
     }
 
-    public void unregisterMagmetormeterSensor() {
+    void unregisterMagmetormeterSensor() {
         if (mUserDriver != null) {
             UserDriverManager.getManager().unregisterSensor(mUserDriver.getUserSensor());
             mUserDriver = null;
