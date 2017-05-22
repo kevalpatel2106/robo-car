@@ -95,7 +95,16 @@ public final class WebServer extends NanoHTTPD implements CommandSender {
         if (ws == null) {
             String uri = session.getUri();
             try {
-                if (uri.equals("/")) return getHTMLResponse("home.html");
+                switch (uri) {
+                    case "/":
+                        return getHTMLResponse("home.html");
+                    case "/css/style.css":
+                        InputStream inputStream = mAssetManager.open("css/style.css");
+                        return new NanoHTTPD.Response(Response.Status.OK, "text/css", inputStream);
+                    case "/script/script.js":
+                        inputStream = mAssetManager.open("script/script.js");
+                        return new NanoHTTPD.Response(Response.Status.OK, "text/javascript", inputStream);
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
