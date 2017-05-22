@@ -42,9 +42,9 @@ public final class Beacon extends BeaconMock {
     private static final String BEACON_ID_1 = "2F234454-CF6D-4A0F-ADF2-F4911BA9FFA6";
     private static final String BEACON_ID_2 = "1";
     private static final String BEACON_ID_3 = "2";
-    private static BeaconTransmitter mBeaconTransmitter;    //Beacon transistor
     @NonNull
     private final Context mContext;
+    private BeaconTransmitter mBeaconTransmitter;    //Beacon transistor
 
     /**
      * Public constructor.

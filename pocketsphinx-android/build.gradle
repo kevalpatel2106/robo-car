@@ -25,12 +25,6 @@ android {
         targetSdkVersion 25
     }
 
-    sourceSets {
-        main {
-            assets.srcDirs = ['./assets']
-        }
-    }
-
     lintOptions {
         abortOnError false
     }

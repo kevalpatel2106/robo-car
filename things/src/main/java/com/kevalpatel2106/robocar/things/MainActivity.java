@@ -16,10 +16,16 @@
 
 package com.kevalpatel2106.robocar.things;
 
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.view.WindowManager;
 
+import com.kevalpatel2106.robocar.things.processor.SpeechProcessorService;
 import com.kevalpatel2106.robocar.things.server.WebServer;
 
 import java.io.IOException;
@@ -27,6 +33,25 @@ import java.io.IOException;
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
     private Controller mController;
+
+    private boolean isSpeechProcessorBound;
+    /**
+     * Service connection listener for {@link SpeechProcessorService}.
+     */
+    private ServiceConnection mSpeechRecognitionServiceConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            // We've bound to LocalService, cast the IBinder and get LocalService instance
+            SpeechProcessorService.LocalBinder binder = (SpeechProcessorService.LocalBinder) service;
+            isSpeechProcessorBound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            isSpeechProcessorBound = false;
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,15 +63,25 @@ public class MainActivity extends AppCompatActivity {
             mController = new Controller(this);
             mController.setSocketWriter(new WebServer(mController, getAssets()));
 
-            //Start the web server
+            //Bind the speech processor
+            Intent intent = new Intent(this, SpeechProcessorService.class);
+            bindService(intent, mSpeechRecognitionServiceConnection, Context.BIND_AUTO_CREATE);
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         mController.turnOff();
+
+        // Unbind the speech processor
+        if (isSpeechProcessorBound) {
+            unbindService(mSpeechRecognitionServiceConnection);
+            isSpeechProcessorBound = false;
+        }
     }
 }

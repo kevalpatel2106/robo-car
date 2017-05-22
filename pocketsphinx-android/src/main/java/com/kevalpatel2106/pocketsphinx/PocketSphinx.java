@@ -32,7 +32,7 @@ import edu.cmu.pocketsphinx.SpeechRecognizerSetup;
 public class PocketSphinx implements RecognitionListener {
 
     private static final String TAG = PocketSphinx.class.getSimpleName();
-    private static final String ACTIVATION_KEYPHRASE = "ok things";
+    private static final String ACTIVATION_KEYPHRASE = "ok baby";
 
     /* Named searches allow to quickly reconfigure the decoder */
     private static final String WAKEUP_SEARCH = "wakeup";
@@ -110,18 +110,15 @@ public class PocketSphinx implements RecognitionListener {
 
     @Override
     public void onTimeout() {
-        Log.i(TAG, "Timeout!");
         recognizer.stop();
         listener.onTimeout();
     }
 
     public void startListeningToActivationPhrase() {
-        Log.i(TAG, "Start listening for the \"ok things\" keyphrase");
         recognizer.startListening(WAKEUP_SEARCH);
     }
 
     public void startListeningToAction() {
-        Log.i(TAG, "Start listening for some actions with a 10secs timeout");
         recognizer.startListening(ACTION_SEARCH, 10000);
     }
 
@@ -133,8 +130,6 @@ public class PocketSphinx implements RecognitionListener {
     }
 
     private void runRecognizerSetup(final Context context) {
-        Log.d(TAG, "Recognizer setup");
-
         // Recognizer initialization is a time-consuming and it involves IO, so we execute it in async task
         new AsyncTask<Void, Void, Exception>() {
             @Override

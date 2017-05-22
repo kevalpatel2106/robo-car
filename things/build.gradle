@@ -32,6 +32,7 @@ android {
 dependencies {
     compile files('libs/nanoHttpd.jar')
     compile project(':tensorflow-android-inference')
+    compile project(':pocketsphinx-android')
 
     provided 'com.google.android.things:androidthings:0.3-devpreview'
 
