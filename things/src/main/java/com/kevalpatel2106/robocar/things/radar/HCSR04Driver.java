@@ -19,6 +19,7 @@ package com.kevalpatel2106.robocar.things.radar;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.google.android.things.pio.Gpio;
 import com.google.android.things.pio.GpioCallback;
@@ -29,37 +30,29 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * This is the driver class for Ultrasonic distance measurement sensor - HC-SR04.
- * This class uses different threads to send pulses to trigger pin and get the echo pulses. This threads
- * are other than main thread. This is to increase the time accuracy for echo pulses by doing
- * simultaneous tasks.
+ * This class uses single thread ({@link #mHandlerThread}) to send pulses to trigger pin and
+ * get the echo pulses.
  *
  * @author Keval {https://github.com/kevalpatel2106}
  * @see 'https://cdn.sparkfun.com/datasheets/Sensors/Proximity/HCSR04.pdf'
  */
 
 final class HCSR04Driver implements AutoCloseable {
+    private static final String TAG = HCSR04Driver.class.getSimpleName();
+
     private static final int INTERVAL_BETWEEN_TRIGGERS = 75;    //Interval between two subsequent pulses
     private static final int TRIG_DURATION_IN_NANO = 10000;     //Trigger pulse duration
+
     @NonNull
     private final DistanceListener mListener;
-    private Gpio mEchoPin;                  //GPIO for echo
-    private Gpio mTrigger;                  //GPIO for trigger
-    private Handler mTriggerHandler;        //Handler for trigger.
+    private Gpio mEchoPin;                      //GPIO for echo
+    private Gpio mTrigger;                      //GPIO for trigger
+
+    private HandlerThread mHandlerThread;       //Thread to handle all the radar operation.
+    private Handler mHandler;                   //Handler for trigger.
+
     private boolean isTransmitting;
-    /**
-     * Runnable to send trigger pulses.
-     */
-    private Runnable mTriggerRunnable = new Runnable() {
-        @Override
-        public void run() {
-            try {
-                sendTriggerPulse();
-                mTriggerHandler.postDelayed(mTriggerRunnable, INTERVAL_BETWEEN_TRIGGERS);
-            } catch (IOException | InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-    };
+
     /**
      * Callback for {@link #mEchoPin}. This callback will be called on both edges.
      */
@@ -76,6 +69,9 @@ final class HCSR04Driver implements AutoCloseable {
                     //From data-sheet (https://cdn.sparkfun.com/datasheets/Sensors/Proximity/HCSR04.pdf)
                     //Notify callback
                     mListener.onDistanceUpdated(TimeUnit.NANOSECONDS.toMicros(System.nanoTime() - mPulseStartTime) / 58.23);
+
+                    //Send the next trigger pulse.
+                    sendTriggerPulse();
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -86,6 +82,7 @@ final class HCSR04Driver implements AutoCloseable {
         @Override
         public void onGpioError(Gpio gpio, int error) {
             super.onGpioError(gpio, error);
+            Log.d(TAG, "onGpioError: " + error);
         }
     };
 
@@ -100,20 +97,15 @@ final class HCSR04Driver implements AutoCloseable {
                  @NonNull Gpio triggerPin,
                  @NonNull DistanceListener listener) {
         try {
+            //Set the trigger pin
+            mTrigger = triggerPin;
+            mTrigger.setDirection(Gpio.DIRECTION_OUT_INITIALLY_LOW);
+
             //Set the echo pins
             mEchoPin = echoPin;
             mEchoPin.setDirection(Gpio.DIRECTION_IN);
             mEchoPin.setEdgeTriggerType(Gpio.EDGE_BOTH);
             mEchoPin.setActiveType(Gpio.ACTIVE_HIGH);
-
-            // Prepare handler for GPIO callback
-            HandlerThread handlerThread = new HandlerThread("EchoCallbackHandlerThread");
-            handlerThread.start();
-            mEchoPin.registerGpioCallback(mEchoCallback, new Handler(handlerThread.getLooper()));
-
-            //Set the trigger pin
-            mTrigger = triggerPin;
-            mTrigger.setDirection(Gpio.DIRECTION_OUT_INITIALLY_LOW);
         } catch (IOException e) {
             e.printStackTrace();
             throw new GpioInitializationException();
@@ -128,15 +120,29 @@ final class HCSR04Driver implements AutoCloseable {
     @SuppressWarnings("WeakerAccess")
     public void startTransmission() {
         if (isTransmitting) return;
-
         isTransmitting = true;
 
-        //Start sending pulses
-        //We are using different thread for sending pulses to increase time accuracy.
-        HandlerThread triggerHandlerThread = new HandlerThread("TriggerHandlerThread");
-        triggerHandlerThread.start();
-        mTriggerHandler = new Handler(triggerHandlerThread.getLooper());
-        mTriggerHandler.post(mTriggerRunnable);
+        try {
+            //Prepare the handler
+            if (mHandler == null) {
+                mHandlerThread = new HandlerThread(TAG);
+                mHandlerThread.start();
+                mHandler = new Handler(mHandlerThread.getLooper());
+            }
+
+            //Register GPIO callbacks
+            mEchoPin.registerGpioCallback(mEchoCallback, mHandler);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        //Send first trigger
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                sendTriggerPulse();
+            }
+        });
     }
 
     /**
@@ -145,25 +151,34 @@ final class HCSR04Driver implements AutoCloseable {
     @SuppressWarnings("WeakerAccess")
     public void stopTransmission() {
         if (isTransmitting) {
-            mTriggerHandler.removeCallbacks(mTriggerRunnable);
-            isTransmitting = false;
+            //Remove callbacks
+            mEchoPin.unregisterGpioCallback(mEchoCallback);
+
+            //Stop handler thread
+            mHandlerThread.quit();
+            mHandler = null;
         }
+        isTransmitting = false;
     }
 
     /**
      * Fire trigger pulse for {@link #TRIG_DURATION_IN_NANO} nano seconds.
      */
-    private void sendTriggerPulse() throws IOException, InterruptedException {
-        //Resetting trigger
-        mTrigger.setValue(false);
-        Thread.sleep(0, 2000);
+    private void sendTriggerPulse() {
+        try {
+            //Resetting trigger
+            mTrigger.setValue(false);
+            Thread.sleep(0, 2000);
 
-        //Set trigger pin for 10 micro seconds.
-        mTrigger.setValue(true);
-        Thread.sleep(0, TRIG_DURATION_IN_NANO);
+            //Set trigger pin for 10 micro seconds.
+            mTrigger.setValue(true);
+            Thread.sleep(0, TRIG_DURATION_IN_NANO);
 
-        // Reset the trigger after 10 micro seconds.
-        mTrigger.setValue(false);
+            // Reset the trigger after 10 micro seconds.
+            mTrigger.setValue(false);
+        } catch (InterruptedException | IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -173,7 +188,6 @@ final class HCSR04Driver implements AutoCloseable {
     public void close() {
         try {
             stopTransmission();
-            mEchoPin.unregisterGpioCallback(mEchoCallback);
             mEchoPin.close();
             mTrigger.close();
         } catch (IOException e) {
