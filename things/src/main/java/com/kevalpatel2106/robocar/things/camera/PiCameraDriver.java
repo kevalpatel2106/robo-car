@@ -103,7 +103,6 @@ final class PiCameraDriver {
                     if (session != null) {
                         session.close();
                         mCaptureSession = null;
-                        Log.d(TAG, "CaptureSession closed");
                     }
                 }
             };

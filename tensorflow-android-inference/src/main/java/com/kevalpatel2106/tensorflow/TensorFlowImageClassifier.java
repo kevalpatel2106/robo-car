@@ -222,6 +222,9 @@ public class TensorFlowImageClassifier implements Classifier {
             }
         }
 
+        //If no match found...
+        if (recognitions.size() <= 0) return recognitions;
+
         //Sort based on the confidence level
         Collections.sort(recognitions, mConfidenceComparator);
 

@@ -52,7 +52,16 @@ final class HCSR04Driver implements AutoCloseable {
     private Handler mHandler;                   //Handler for trigger.
 
     private boolean isTransmitting;
-
+    /**
+     * Runnable to send trigger pulses.
+     */
+    private Runnable mTriggerRunnable = new Runnable() {
+        @Override
+        public void run() {
+            sendTriggerPulse();
+            mHandler.postDelayed(mTriggerRunnable, INTERVAL_BETWEEN_TRIGGERS);
+        }
+    };
     /**
      * Callback for {@link #mEchoPin}. This callback will be called on both edges.
      */
@@ -69,9 +78,6 @@ final class HCSR04Driver implements AutoCloseable {
                     //From data-sheet (https://cdn.sparkfun.com/datasheets/Sensors/Proximity/HCSR04.pdf)
                     //Notify callback
                     mListener.onDistanceUpdated(TimeUnit.NANOSECONDS.toMicros(System.nanoTime() - mPulseStartTime) / 58.23);
-
-                    //Send the next trigger pulse.
-                    sendTriggerPulse();
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -137,12 +143,7 @@ final class HCSR04Driver implements AutoCloseable {
         }
 
         //Send first trigger
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                sendTriggerPulse();
-            }
-        });
+        mHandler.post(mTriggerRunnable);
     }
 
     /**
