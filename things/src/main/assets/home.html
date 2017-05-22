@@ -13,14 +13,15 @@
   ~  See the License for the specific language governing permissions and
   ~  limitations under the License.
   -->
-
 <html lang="en">
+
 <head>
     <title>Robot Control</title>
     <meta charset="utf-8">
     <link rel="stylesheet" href="css/style.css"/>
     <script src="script/script.js"></script>
 </head>
+
 <body>
 <H1>Robocar Controller</H1>
 <div id="all">
@@ -28,14 +29,16 @@
         <input type="button" value="FORWARD" class="button buttonGreen" onclick="send('forward')"/>
     </div>
     <div class="container">
-        <input type="button" style="margin-right:25" value="LEFT" class="button buttonBlue" onclick="send('left')"/>
+        <input type="button" style="margin-right:25" value="LEFT" class="button buttonBlue"
+               onclick="send('left')"/>
         <input type="button" value="RIGHT" class="button buttonBlue" onclick="send('right')"/>
     </div>
     <div class="container">
         <input type="button" value="BACKWARD" class="button buttonRed" onclick="send('reverse')"/>
     </div>
     <div class="container">
-        <input type="button" value="START VIDEO" class="button buttonGray" onclick="send('capture')"/>
+        <input type="button" value="START VIDEO" class="button buttonGray"
+               onclick="send('capture')"/>
     </div>
     <div class="container">
         <label class="item"><img id="IMG" src=""/></label>
@@ -45,4 +48,5 @@
     </div>
 </div>
 </body>
+
 </html>
