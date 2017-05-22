@@ -243,8 +243,6 @@ final class PiCameraDriver {
                     Collections.singletonList(mImageReader.getSurface()),
                     mSessionCallback,
                     mBackgroundHandler);
-
-            Log.d(TAG, "takePicture: Image Captured.");
         } catch (CameraAccessException cae) {
             Log.d(TAG, "access exception while preparing pic", cae);
         }

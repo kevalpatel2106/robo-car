@@ -20,7 +20,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Handler;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.google.android.things.pio.PeripheralManagerService;
 import com.kevalpatel2106.robocar.things.camera.CameraCaptureListener;
@@ -156,7 +155,6 @@ public final class Controller implements CameraCaptureListener {
     }
 
     public void captureImage() {
-        Log.d(TAG, "captureImage: Captured " + System.currentTimeMillis());
         if (mChassis.getCamera() != null) mChassis.getCamera().takePicture();
     }
 
@@ -175,7 +173,7 @@ public final class Controller implements CameraCaptureListener {
     @Override
     public void onImageCaptured(@NonNull Bitmap bitmap) {
         mCommandSender.sendImage(bitmap);
-        processImage(bitmap);
+//        processImage(bitmap);
         captureImage();
     }
 

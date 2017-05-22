@@ -17,6 +17,7 @@
 package com.kevalpatel2106.robocar.things.radar;
 
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.google.android.things.pio.Gpio;
 import com.google.android.things.pio.PeripheralManagerService;
@@ -82,6 +83,7 @@ public final class FrontRadar extends RadarMock implements HCSR04Driver.Distance
     @Override
     public void onDistanceUpdated(double newDistance) {
         if (newDistance < DISTANCE_THRASHOLD_IN_CM) {
+            Log.d("Front Radar", "onDistanceUpdated: " + newDistance);
             mListener.onObstacleDetected();
         }
     }

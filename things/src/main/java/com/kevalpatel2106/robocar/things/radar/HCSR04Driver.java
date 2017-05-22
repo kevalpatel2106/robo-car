@@ -38,7 +38,7 @@ import java.util.concurrent.TimeUnit;
  */
 
 final class HCSR04Driver implements AutoCloseable {
-    private static final int INTERVAL_BETWEEN_TRIGGERS = 65;    //Interval between two subsequent pulses
+    private static final int INTERVAL_BETWEEN_TRIGGERS = 75;    //Interval between two subsequent pulses
     private static final int TRIG_DURATION_IN_NANO = 10000;     //Trigger pulse duration
     @NonNull
     private final DistanceListener mListener;
