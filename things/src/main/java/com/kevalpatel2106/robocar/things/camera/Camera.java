@@ -37,18 +37,20 @@ import com.kevalpatel2106.robocar.things.Utils;
 public final class Camera extends CameraMock implements ImageReader.OnImageAvailableListener {
     private static final String TAG = Camera.class.getSimpleName();
     private static final String CAMERA_THREAD_NAME = "CameraThread";
+
     @NonNull
     private final Context mContext;
     private CameraCaptureListener mListener;
 
-    private Handler mBackgroundHandler;
-    private HandlerThread mCameraThread;    //Background thread to capture and process captured image.
+    private Handler mBackgroundHandler;         //Thread handler for performing camera operations.
+    private HandlerThread mCameraThread;        //Background thread to capture and process captured image.
     private PiCameraDriver mPiCamera;           //Pi camera.
 
     /**
      * Public constructor.
      *
-     * @param context instance of thr caller.
+     * @param context  instance of thr caller.
+     * @param listener {@link CameraCaptureListener}
      */
     public Camera(@NonNull Context context,
                   @NonNull CameraCaptureListener listener) {
@@ -89,7 +91,7 @@ public final class Camera extends CameraMock implements ImageReader.OnImageAvail
     }
 
     /**
-     * Start capturing the still image. Once image is captured, you can get the sOutBitmap in
+     * Start capturing the still image. Once image is captured, you can get the bitmap in
      * {@link CameraCaptureListener}.
      *
      * @see CameraCaptureListener#onImageCaptured(Bitmap)
@@ -110,23 +112,21 @@ public final class Camera extends CameraMock implements ImageReader.OnImageAvail
     }
 
     /**
-     * Get the sOutBitmap image from the camera. This runs on the background thread.
-     * This function works on the {@link Camera#mCameraThread}.
+     * Get the sOutBitmap image from the camera. This function works on the {@link Camera#mCameraThread} thread.
      *
      * @param reader {@link ImageReader}
      * @see ImageReader.OnImageAvailableListener
      */
     @Override
-    public void onImageAvailable(ImageReader reader) {
+    public void onImageAvailable(@NonNull ImageReader reader) {
         //Get the image in sOutBitmap.
         try (Image image = reader.acquireNextImage()) {
-            Bitmap sOutBitmap = Utils.imageToBitmap(image);
+            Bitmap capturedBmp = Utils.imageToBitmap(image);
             image.close();
 
-            if (sOutBitmap != null) {
-                mListener.onImageCaptured(sOutBitmap);
+            if (capturedBmp != null) {
+                mListener.onImageCaptured(capturedBmp);
             } else {
-                mListener.onError();
                 Log.e(TAG, "onImageAvailable: ImageReader did not returned any byte.");
             }
         }

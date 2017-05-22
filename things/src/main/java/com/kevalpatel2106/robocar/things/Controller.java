@@ -22,10 +22,11 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 
 import com.google.android.things.pio.PeripheralManagerService;
+import com.kevalpatel2106.robocar.things.camera.Camera;
 import com.kevalpatel2106.robocar.things.camera.CameraCaptureListener;
 import com.kevalpatel2106.robocar.things.chassis.Chassis;
 import com.kevalpatel2106.robocar.things.radar.ObstacleAlertListener;
-import com.kevalpatel2106.robocar.things.server.CommandSender;
+import com.kevalpatel2106.robocar.things.server.SocketWriter;
 import com.kevalpatel2106.robocar.things.server.WebServer;
 import com.kevalpatel2106.tensorflow.Classifier;
 import com.kevalpatel2106.tensorflow.TensorFlowImageClassifier;
@@ -37,6 +38,7 @@ import io.reactivex.Flowable;
 import io.reactivex.FlowableEmitter;
 import io.reactivex.FlowableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
@@ -49,12 +51,11 @@ import io.reactivex.schedulers.Schedulers;
 
 public final class Controller implements CameraCaptureListener {
     private static final String TAG = Controller.class.getSimpleName();
-    private final Chassis mChassis;                       //Car chassis
-    private final TensorFlowImageClassifier mTfInterface;
-
-    private CommandSender mCommandSender;
-
-    private boolean isLockedForObstacle = false;    //Bool to indicate if the external movement control is locked?
+    private final Chassis mChassis;                         //Car chassis
+    private final TensorFlowImageClassifier mTfInterface;   //Tensorflow interface
+    private SocketWriter mSocketWriter;                     //Write on socket.
+    private boolean isLockedForObstacle = false;            //Bool to indicate if the external movement control is locked?
+    private CompositeDisposable mCompositeDisposable = new CompositeDisposable();
 
     /**
      * {@link ObstacleAlertListener} to prevent collision with the object using front radar.
@@ -76,16 +77,6 @@ public final class Controller implements CameraCaptureListener {
                     isLockedForObstacle = false;     //Release external movement control
                 }
             }, 400);
-        }
-    };
-    private Consumer<List<Classifier.Recognition>> mTfProcessorObserver = new Consumer<List<Classifier.Recognition>>() {
-        @Override
-        public void accept(@io.reactivex.annotations.NonNull List<Classifier.Recognition> recognitions) throws Exception {
-            String resultStr = "";
-            for (Classifier.Recognition result : recognitions) {
-                resultStr = resultStr + result.getTitle() + " " + result.getConfidence() + "<br/>";
-                mCommandSender.sendMessage(resultStr);
-            }
         }
     };
 
@@ -111,8 +102,14 @@ public final class Controller implements CameraCaptureListener {
         stop();
     }
 
-    public void setCommandSender(WebServer server) {
-        mCommandSender = server.getListener();
+    /**
+     * Set the {@link SocketWriter}. So that controller can write important information on socket.
+     *
+     * @param server {@link WebServer}
+     */
+    @SuppressWarnings("WeakerAccess")
+    public void setSocketWriter(@NonNull WebServer server) {
+        mSocketWriter = server.getSocketWriter();
     }
 
     /**
@@ -164,20 +161,27 @@ public final class Controller implements CameraCaptureListener {
     @SuppressWarnings("WeakerAccess")
     public void turnOff() {
         try {
+            mTfInterface.close();
             mChassis.turnOff();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    /**
+     * Callback to receive when image capture in completed. This function works on the {@link Camera#mCameraThread}.
+     *
+     * @param bitmap Captured {@link Bitmap}
+     */
     @Override
     public void onImageCaptured(@NonNull Bitmap bitmap) {
-        mCommandSender.sendImage(bitmap);
-//        processImage(bitmap);
+        mSocketWriter.writeImage(bitmap);
+        processImage(bitmap);
         captureImage();
     }
 
     private void processImage(@NonNull final Bitmap bitmap) {
+        //Create observable
         Flowable<List<Classifier.Recognition>> observable = Flowable
                 .create(new FlowableOnSubscribe<List<Classifier.Recognition>>() {
                     @Override
@@ -186,13 +190,24 @@ public final class Controller implements CameraCaptureListener {
                     }
                 }, BackpressureStrategy.MISSING);
 
-        observable.observeOn(Schedulers.io())
-                .subscribeOn(AndroidSchedulers.mainThread())
-                .subscribe(mTfProcessorObserver);
-    }
+        //Create observer
+        Consumer<List<Classifier.Recognition>> mTfProcessorObserver = new Consumer<List<Classifier.Recognition>>() {
+            @Override
+            public void accept(@io.reactivex.annotations.NonNull List<Classifier.Recognition> recognitions) throws Exception {
+                //Write the result on socket.
+                String resultStr = "";
+                for (Classifier.Recognition result : recognitions)
+                    resultStr = resultStr + result.getTitle() + " " + result.getConfidence() + "<br/>";
+                mSocketWriter.writeMessage(resultStr);
 
-    @Override
-    public void onError() {
-        //TODO handle error.
+                //Remove previous disposables.
+                mCompositeDisposable.clear();
+            }
+        };
+
+        //Start the observable
+        mCompositeDisposable.add(observable.observeOn(Schedulers.io())
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .subscribe(mTfProcessorObserver));
     }
 }

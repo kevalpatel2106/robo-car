@@ -17,14 +17,32 @@
 package com.kevalpatel2106.robocar.things.server;
 
 import android.graphics.Bitmap;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 /**
  * Created by Keval on 19-May-17.
+ * Interface to write bytes on the socket.
+ *
+ * @author Keval {https://github.com/kevalpatel2106}
+ * @see WebServer
  */
 
-public interface CommandSender {
+public interface SocketWriter {
 
-    void sendImage(Bitmap image);
+    /**
+     * Write the bitmap on the socket. This will be displayed in "IMG" tag of the website.
+     * It is advisable to make this method synchronised.
+     *
+     * @param image bitmap to display.
+     */
+    void writeImage(@NonNull Bitmap image);
 
-    void sendMessage(String msg);
+    /**
+     * Write the text on the socket.
+     * It is advisable to make this method synchronised.
+     *
+     * @param msg String message to write on socket
+     */
+    void writeMessage(@Nullable String msg);
 }

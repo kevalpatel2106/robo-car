@@ -28,8 +28,9 @@ import java.nio.ByteBuffer;
 
 /**
  * Created by Keval Patel on 21/05/17.
+ * Common utility functions.
  *
- * @author 'https://github.com/kevalpatel2106'
+ * @author Keval {https://github.com/kevalpatel2106}
  */
 
 public class Utils {
@@ -51,6 +52,12 @@ public class Utils {
         return BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
     }
 
+    /**
+     * Save image bitmap to the path provided.
+     *
+     * @param bitmap Bitmap to save
+     * @param path   File path where image will be save.
+     */
     public static void saveBitmap(@Nullable Bitmap bitmap, @NonNull String path) {
         if (bitmap != null) {
             try {

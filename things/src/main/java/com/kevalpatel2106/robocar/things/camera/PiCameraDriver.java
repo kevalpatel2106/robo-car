@@ -40,14 +40,14 @@ import java.util.Collections;
 import static android.content.Context.CAMERA_SERVICE;
 
 /**
- * Driver for the Raspberry Pi camera.
+ * Driver for the Raspberry Pi camera. Whole camera operation runs on a separate thread.
  *
  * @see 'https://github.com/androidthings/doorbell/blob/master/app/src/main/java/com/example/androidthings/doorbell/DoorbellCamera.java'
  */
 final class PiCameraDriver {
     private static final String TAG = PiCameraDriver.class.getSimpleName();
 
-    //5MP resolution
+    //Max 5MP resolution
     private static final int IMAGE_WIDTH = 480;
     private static final int IMAGE_HEIGHT = 320;
     private static final int MAX_IMAGES = 1;
@@ -111,7 +111,12 @@ final class PiCameraDriver {
      * An {@link ImageReader} that handles still image capture.
      */
     private ImageReader mImageReader;
+
+    /**
+     * Camera capture thread handler.
+     */
     private Handler mBackgroundHandler;
+
     /**
      * Callback handling session state changes
      */
@@ -192,9 +197,9 @@ final class PiCameraDriver {
     /**
      * Initialize the camera device
      */
-    void initializeCamera(Context context,
-                          Handler backgroundHandler,
-                          ImageReader.OnImageAvailableListener imageAvailableListener) {
+    void initializeCamera(@NonNull Context context,
+                          @NonNull Handler backgroundHandler,
+                          @NonNull ImageReader.OnImageAvailableListener imageAvailableListener) {
         mBackgroundHandler = backgroundHandler;
 
         // Discover the camera instance
@@ -203,10 +208,10 @@ final class PiCameraDriver {
         try {
             camIds = manager.getCameraIdList();
         } catch (CameraAccessException e) {
-            Log.d(TAG, "Cam access exception getting IDs", e);
+            Log.e(TAG, "Cam access exception getting IDs", e);
         }
         if (camIds.length < 1) {
-            Log.d(TAG, "No cameras found");
+            Log.e(TAG, "No cameras found");
             return;
         }
         String id = camIds[0];

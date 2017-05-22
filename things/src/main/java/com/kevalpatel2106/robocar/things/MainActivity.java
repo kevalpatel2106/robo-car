@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
         try {
             //Initialize the movement controller
             mController = new Controller(this);
-            mController.setCommandSender(new WebServer(mController, getAssets()));
+            mController.setSocketWriter(new WebServer(mController, getAssets()));
 
             //Start the web server
         } catch (IOException e) {

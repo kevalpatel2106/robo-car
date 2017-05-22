@@ -36,10 +36,4 @@ public interface CameraCaptureListener {
      */
     @WorkerThread
     void onImageCaptured(@NonNull Bitmap bitmap);
-
-    /**
-     * Callback to receive when error occurred in image captured. This function works on the {@link Camera#mCameraThread}.
-     */
-    @WorkerThread
-    void onError();
 }

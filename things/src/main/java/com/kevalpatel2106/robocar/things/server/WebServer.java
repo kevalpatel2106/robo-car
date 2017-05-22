@@ -19,6 +19,7 @@ package com.kevalpatel2106.robocar.things.server;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Base64;
 import android.util.Log;
 
@@ -42,7 +43,7 @@ import fi.iki.elonen.WebSocketResponseHandler;
  * @see 'https://github.com/NanoHttpd/nanohttpd'
  */
 
-public final class WebServer extends NanoHTTPD implements CommandSender {
+public final class WebServer extends NanoHTTPD implements SocketWriter {
     private static final String TAG = WebServer.class.getSimpleName();
 
     @NonNull
@@ -82,7 +83,10 @@ public final class WebServer extends NanoHTTPD implements CommandSender {
         Log.d(TAG, "WebServer: Starting server.");
     }
 
-    public CommandSender getListener() {
+    /**
+     * @return {@link SocketWriter}.
+     */
+    public SocketWriter getSocketWriter() {
         return this;
     }
 
@@ -125,21 +129,32 @@ public final class WebServer extends NanoHTTPD implements CommandSender {
         return new NanoHTTPD.Response(Response.Status.OK, "text/html", inputStream);
     }
 
+    /**
+     * Write the bitmap on the socket. This will be displayed in "IMG" tag of the website.
+     *
+     * @param image bitmap to display.
+     */
     @Override
-    public void sendImage(Bitmap msg) {
+    public void writeImage(@NonNull Bitmap image) {
         try {
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            msg.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+            image.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
             byte[] byteArray = byteArrayOutputStream.toByteArray();
-            sendMessage("data:image/png;base64," + Base64.encodeToString(byteArray, Base64.DEFAULT));
+            writeMessage("data:image/png;base64," + Base64.encodeToString(byteArray, Base64.DEFAULT));
             byteArrayOutputStream.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
+    /**
+     * Write the text on the socket.
+     * It is advisable to make this method synchronised.
+     *
+     * @param msg String message to write on socket
+     */
     @Override
-    public synchronized void sendMessage(final String msg) {
+    public synchronized void writeMessage(@Nullable final String msg) {
         if (msg == null || mSocket == null) return;
         try {
             mSocket.send(msg);

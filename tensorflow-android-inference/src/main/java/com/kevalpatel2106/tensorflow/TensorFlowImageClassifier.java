@@ -77,9 +77,9 @@ public class TensorFlowImageClassifier implements Classifier {
     private float[] floatValues;
     private float[] outputs;
     private String[] outputNames;
-    private int[] intValues;
+    private int[] mBmpPixelValues;
 
-    private TensorFlowInferenceInterface inferenceInterface;
+    private TensorFlowInferenceInterface mTensorFlowInferenceInterface;
     private Comparator<Recognition> mConfidenceComparator = new Comparator<Recognition>() {
         @Override
         public int compare(Recognition lhs, Recognition rhs) {
@@ -94,8 +94,15 @@ public class TensorFlowImageClassifier implements Classifier {
      * @param context The context from which to get the asset manager to be used to load assets.
      */
     public TensorFlowImageClassifier(Context context) {
-        this(context.getAssets(), MODEL_FILE, LABEL_FILE, NUM_CLASSES, INPUT_SIZE, IMAGE_MEAN,
-                IMAGE_STD, INPUT_NAME, OUTPUT_NAME);
+        this(context.getAssets(),
+                MODEL_FILE,
+                LABEL_FILE,
+                NUM_CLASSES,
+                INPUT_SIZE,
+                IMAGE_MEAN,
+                IMAGE_STD,
+                INPUT_NAME,
+                OUTPUT_NAME);
     }
 
     /**
@@ -111,9 +118,16 @@ public class TensorFlowImageClassifier implements Classifier {
      * @param inputName     The label of the image input node.
      * @param outputName    The label of the output node.
      */
-    public TensorFlowImageClassifier(AssetManager assetManager, String modelFilename,
-                                     String labelFilename, int numClasses, int inputSize, int imageMean, float imageStd,
-                                     String inputName, String outputName) {
+    @SuppressWarnings("WeakerAccess")
+    public TensorFlowImageClassifier(AssetManager assetManager,
+                                     String modelFilename,
+                                     String labelFilename,
+                                     int numClasses,
+                                     int inputSize,
+                                     int imageMean,
+                                     float imageStd,
+                                     String inputName,
+                                     String outputName) {
         this.inputName = inputName;
         this.outputName = outputName;
 
@@ -131,16 +145,23 @@ public class TensorFlowImageClassifier implements Classifier {
         this.outputNames = new String[]{outputName};
         this.floatValues = new float[inputSize * inputSize * 3];
         this.outputs = new float[numClasses];
-        this.intValues = new int[inputSize * inputSize];
+        this.mBmpPixelValues = new int[inputSize * inputSize];
 
-        this.inferenceInterface = new TensorFlowInferenceInterface();
-        this.inferenceInterface.initializeTensorFlow(assetManager, modelFilename);
+        this.mTensorFlowInferenceInterface = new TensorFlowInferenceInterface();
+        this.mTensorFlowInferenceInterface.initializeTensorFlow(assetManager, modelFilename);
     }
 
+    /**
+     * Read the labels from {@link #LABEL_FILE}.
+     *
+     * @param assetManager The asset manager to be used to load assets.
+     * @param filename     Name of the label file. (By default it is {@link #LABEL_FILE}.)
+     * @return Array list of label names.
+     */
     private ArrayList<String> readLabels(AssetManager assetManager, String filename) {
         ArrayList<String> result = new ArrayList<>();
+        BufferedReader br = null;
         try {
-            BufferedReader br = null;
             br = new BufferedReader(new InputStreamReader(assetManager.open(filename)));
             String line;
             while ((line = br.readLine()) != null) {
@@ -150,36 +171,48 @@ public class TensorFlowImageClassifier implements Classifier {
         } catch (IOException ex) {
             ex.printStackTrace();
             throw new IllegalStateException("Cannot read labels from " + filename);
+        } finally {
+            try {
+                if (br != null) br.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         return result;
     }
 
+    /**
+     * Classify image.
+     *
+     * @param bitmap Image to recognize.
+     * @return List of top three confidant {@link com.kevalpatel2106.tensorflow.Classifier.Recognition}.
+     */
     @Override
     public List<Recognition> recognizeImage(Bitmap bitmap) {
         bitmap = Bitmap.createScaledBitmap(bitmap,
                 TensorFlowImageClassifier.INPUT_SIZE,
                 TensorFlowImageClassifier.INPUT_SIZE,
                 false);
-        bitmap.getPixels(intValues, 0, bitmap.getWidth(), 0, 0, bitmap.getWidth(), bitmap.getHeight());
+        bitmap.getPixels(mBmpPixelValues, 0, bitmap.getWidth(), 0, 0, bitmap.getWidth(), bitmap.getHeight());
 
         // Preprocess the image data from 0-255 int to normalized float based
         // on the provided parameters.
-        for (int i = 0; i < intValues.length; ++i) {
-            final int val = intValues[i];
+        for (int i = 0; i < mBmpPixelValues.length; ++i) {
+            final int val = mBmpPixelValues[i];
             floatValues[i * 3] = (((val >> 16) & 0xFF) - imageMean) / imageStd;
             floatValues[i * 3 + 1] = (((val >> 8) & 0xFF) - imageMean) / imageStd;
             floatValues[i * 3 + 2] = ((val & 0xFF) - imageMean) / imageStd;
         }
 
         // Copy the input data into TensorFlow.
-        inferenceInterface.fillNodeFloat(
+        mTensorFlowInferenceInterface.fillNodeFloat(
                 inputName, new int[]{1, inputSize, inputSize, 3}, floatValues);
 
         // Run the inference call.
-        inferenceInterface.runInference(outputNames);
+        mTensorFlowInferenceInterface.runInference(outputNames);
 
         // Copy the output Tensor back into the output array.
-        inferenceInterface.readNodeFloat(outputName, outputs);
+        mTensorFlowInferenceInterface.readNodeFloat(outputName, outputs);
 
         // Find the best classifications.
         ArrayList<Recognition> recognitions = new ArrayList<>();
@@ -189,13 +222,19 @@ public class TensorFlowImageClassifier implements Classifier {
             }
         }
 
+        //Sort based on the confidence level
         Collections.sort(recognitions, mConfidenceComparator);
+
+        //Return max top 3 results.
         int recognitionsSize = Math.min(recognitions.size(), MAX_RESULTS);
         return recognitions.subList(0, recognitionsSize - 1);
     }
 
+    /**
+     * Close the TF and release resources.
+     */
     @Override
     public void close() {
-        inferenceInterface.close();
+        mTensorFlowInferenceInterface.close();
     }
 }
