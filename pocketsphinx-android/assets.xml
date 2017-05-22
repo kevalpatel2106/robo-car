@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~  Copyright 2017 Keval Patel.
+  ~
+  ~  Licensed under the Apache License, Version 2.0 (the "License");
+  ~  you may not use this file except in compliance with the License.
+  ~  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing, software
+  ~  distributed under the License is distributed on an "AS IS" BASIS,
+  ~  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~  See the License for the specific language governing permissions and
+  ~  limitations under the License.
+  -->
+
+<project name="assets">
+    <property name="assets.list.name" value="assets.lst"/>
+    <property name="assets.dir" value="src/main/assets/sync"/>
+    <property name="assets.hash.type" value="md5"/>
+    <property name="assets.ctl.files"
+              value="**/*.${assets.hash.type},${assets.list.name}"/>
+
+    <fileset dir="${assets.dir}" excludes="${assets.ctl.files}" id="assets"/>
+
+    <target name="clean_assets">
+        <delete>
+            <fileset dir="${assets.dir}" includes="${assets.ctl.files}"/>
+        </delete>
+    </target>
+
+    <target name="list">
+        <pathconvert
+            dirsep="/" pathsep="${line.separator}"
+            property="asset.list" refid="assets">
+            <map from="${basedir}/${assets.dir}/" to=""/>
+        </pathconvert>
+        <echo file="${assets.dir}/${assets.list.name}" message="${asset.list}"/>
+    </target>
+
+    <target name="checksum">
+        <checksum algorithm="${assets.hash.type}">
+            <fileset refid="assets"/>
+        </checksum>
+    </target>
+</project>

@@ -14,4 +14,32 @@
  *  limitations under the License.
  */
 
-include ':things', ':tensorflow-android-inference', ':pocketsphinx-android'
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion 25
+    buildToolsVersion "25.0.3"
+
+    defaultConfig {
+        minSdkVersion 21
+        targetSdkVersion 25
+    }
+
+    sourceSets {
+        main {
+            assets.srcDirs = ['./assets']
+        }
+    }
+
+    lintOptions {
+        abortOnError false
+    }
+}
+
+ant.importBuild 'assets.xml'
+preBuild.dependsOn(list, checksum)
+clean.dependsOn(clean_assets)
+
+dependencies {
+    compile files('libs/pocketsphinx-java-interface.jar')
+}
