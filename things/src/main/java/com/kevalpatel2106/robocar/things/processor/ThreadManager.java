@@ -31,8 +31,9 @@ public class ThreadManager {
     private static HandlerThread sRadarThread;
     private static HandlerThread sCameraThread;
 
-    public static Handler getTensorflowHandler() {
+    public static Handler getSpeechHandler() {
         HandlerThread tfHandler = new HandlerThread("TfHandler");
+        tfHandler.setPriority(Thread.MAX_PRIORITY);
         tfHandler.start();
         return new Handler(tfHandler.getLooper());
     }

@@ -25,6 +25,7 @@ import com.google.android.things.pio.PeripheralManagerService;
 import com.kevalpatel2106.robocar.things.camera.Camera;
 import com.kevalpatel2106.robocar.things.camera.CameraCaptureListener;
 import com.kevalpatel2106.robocar.things.chassis.Chassis;
+import com.kevalpatel2106.robocar.things.processor.SpeechProcessor;
 import com.kevalpatel2106.robocar.things.processor.ThreadManager;
 import com.kevalpatel2106.robocar.things.radar.ObstacleAlertListener;
 import com.kevalpatel2106.robocar.things.server.SocketWriter;
@@ -60,7 +61,9 @@ public final class Controller implements CameraCaptureListener {
     private CompositeDisposable mCompositeDisposable = new CompositeDisposable();
 
     private TensorFlowImageClassifier mTensorFlowImageClassifier;
-    private Handler mImageProcessorHandler;
+    private Handler mSpeechProcessorHandler;
+
+    private SpeechProcessor mSpeechProcessor;
     /**
      * {@link ObstacleAlertListener} to prevent collision with the object using front radar.
      */
@@ -90,12 +93,13 @@ public final class Controller implements CameraCaptureListener {
      * @param context instance of caller activity.
      */
     public Controller(@NonNull final Context context) {
+        mTensorFlowImageClassifier = new TensorFlowImageClassifier(context);
 
-        mImageProcessorHandler = ThreadManager.getTensorflowHandler();
-        mImageProcessorHandler.post(new Runnable() {
+        mSpeechProcessorHandler = ThreadManager.getSpeechHandler();
+        mSpeechProcessorHandler.post(new Runnable() {
             @Override
             public void run() {
-                mTensorFlowImageClassifier = new TensorFlowImageClassifier(context);
+                mSpeechProcessor = new SpeechProcessor(context, Controller.this);
             }
         });
 
@@ -172,13 +176,7 @@ public final class Controller implements CameraCaptureListener {
     @SuppressWarnings("WeakerAccess")
     public void turnOff() {
         try {
-            mImageProcessorHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    if (mTensorFlowImageClassifier != null) mTensorFlowImageClassifier.close();
-                }
-            });
-
+            if (mTensorFlowImageClassifier != null) mTensorFlowImageClassifier.close();
             mChassis.turnOff();
         } catch (Exception e) {
             e.printStackTrace();
@@ -224,7 +222,7 @@ public final class Controller implements CameraCaptureListener {
 
         //Start the observable
         mCompositeDisposable.add(observable.observeOn(Schedulers.io())
-                .subscribeOn(AndroidSchedulers.from(mImageProcessorHandler.getLooper()))
+                .subscribeOn(AndroidSchedulers.mainThread())
                 .subscribe(mTfProcessorObserver));
     }
 }

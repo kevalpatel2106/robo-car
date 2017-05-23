@@ -52,8 +52,6 @@
             </intent-filter>
 
         </activity>
-
-        <service android:name=".processor.SpeechProcessorService"/>
     </application>
 
 </manifest>
