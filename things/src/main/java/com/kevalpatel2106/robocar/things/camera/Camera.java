@@ -26,6 +26,7 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.kevalpatel2106.robocar.things.Utils;
+import com.kevalpatel2106.robocar.things.processor.ThreadManager;
 
 /**
  * Created by Keval Patel on 17/05/17.
@@ -65,8 +66,7 @@ public final class Camera extends CameraMock implements ImageReader.OnImageAvail
     public void turnOn() {
         if (mBackgroundHandler != null) turnOff();
 
-        mCameraThread = new HandlerThread(CAMERA_THREAD_NAME);
-        mCameraThread.start();
+        mCameraThread = ThreadManager.getCameraThread();
         mBackgroundHandler = new Handler(mCameraThread.getLooper());
 
         //Initialize the camera.

@@ -25,6 +25,7 @@ import com.google.android.things.pio.PeripheralManagerService;
 import com.kevalpatel2106.robocar.things.camera.Camera;
 import com.kevalpatel2106.robocar.things.camera.CameraCaptureListener;
 import com.kevalpatel2106.robocar.things.chassis.Chassis;
+import com.kevalpatel2106.robocar.things.processor.ThreadManager;
 import com.kevalpatel2106.robocar.things.radar.ObstacleAlertListener;
 import com.kevalpatel2106.robocar.things.server.SocketWriter;
 import com.kevalpatel2106.robocar.things.server.WebServer;
@@ -52,11 +53,14 @@ import io.reactivex.schedulers.Schedulers;
 public final class Controller implements CameraCaptureListener {
     private static final String TAG = Controller.class.getSimpleName();
     private final Chassis mChassis;                         //Car chassis
-    private final TensorFlowImageClassifier mTfInterface;   //Tensorflow interface
+
     private SocketWriter mSocketWriter;                     //Write on socket.
+
     private boolean isLockedForObstacle = false;            //Bool to indicate if the external movement control is locked?
     private CompositeDisposable mCompositeDisposable = new CompositeDisposable();
 
+    private TensorFlowImageClassifier mTensorFlowImageClassifier;
+    private Handler mImageProcessorHandler;
     /**
      * {@link ObstacleAlertListener} to prevent collision with the object using front radar.
      */
@@ -85,8 +89,15 @@ public final class Controller implements CameraCaptureListener {
      *
      * @param context instance of caller activity.
      */
-    public Controller(@NonNull Context context) {
-        mTfInterface = new TensorFlowImageClassifier(context);
+    public Controller(@NonNull final Context context) {
+
+        mImageProcessorHandler = ThreadManager.getTensorflowHandler();
+        mImageProcessorHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                mTensorFlowImageClassifier = new TensorFlowImageClassifier(context);
+            }
+        });
 
         //Build chassis.
         PeripheralManagerService service = new PeripheralManagerService();
@@ -161,7 +172,13 @@ public final class Controller implements CameraCaptureListener {
     @SuppressWarnings("WeakerAccess")
     public void turnOff() {
         try {
-            mTfInterface.close();
+            mImageProcessorHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    if (mTensorFlowImageClassifier != null) mTensorFlowImageClassifier.close();
+                }
+            });
+
             mChassis.turnOff();
         } catch (Exception e) {
             e.printStackTrace();
@@ -186,7 +203,7 @@ public final class Controller implements CameraCaptureListener {
                 .create(new FlowableOnSubscribe<List<Classifier.Recognition>>() {
                     @Override
                     public void subscribe(FlowableEmitter<List<Classifier.Recognition>> emitter) throws Exception {
-                        emitter.onNext(mTfInterface.recognizeImage(bitmap));
+                        emitter.onNext(mTensorFlowImageClassifier.recognizeImage(bitmap));
                     }
                 }, BackpressureStrategy.MISSING);
 
@@ -207,7 +224,7 @@ public final class Controller implements CameraCaptureListener {
 
         //Start the observable
         mCompositeDisposable.add(observable.observeOn(Schedulers.io())
-                .subscribeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(AndroidSchedulers.from(mImageProcessorHandler.getLooper()))
                 .subscribe(mTfProcessorObserver));
     }
 }

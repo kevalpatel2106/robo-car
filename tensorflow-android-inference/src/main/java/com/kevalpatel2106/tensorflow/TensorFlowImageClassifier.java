@@ -35,6 +35,9 @@ import java.util.List;
  * A classifier specialized to label images using TensorFlow.
  */
 public class TensorFlowImageClassifier implements Classifier {
+
+    private static final String TAG = TensorFlowImageClassifier.class.getSimpleName();
+
     // These are the settings for the original v1 Inception model. If you want to
     // use a model that's been produced from the TensorFlow for Poets codelab,
     // you'll need to set IMAGE_SIZE = 299, IMAGE_MEAN = 128, IMAGE_STD = 128,
@@ -49,7 +52,6 @@ public class TensorFlowImageClassifier implements Classifier {
     // INPUT_NAME = "Mul:0", and OUTPUT_NAME = "final_result:0".
     // You'll also need to update the MODEL_FILE and LABEL_FILE paths to point to
     // the ones you produced.
-    private static final String TAG = "TFImageClassifier";
     // Note: the actual number of classes for Inception is 1001, but the output layer size is 1008.
     private static final int NUM_CLASSES = 1008;
     private static final int IMAGE_MEAN = 117;

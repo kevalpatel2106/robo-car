@@ -24,6 +24,7 @@ import android.util.Log;
 import com.google.android.things.pio.Gpio;
 import com.google.android.things.pio.GpioCallback;
 import com.kevalpatel2106.robocar.things.exception.GpioInitializationException;
+import com.kevalpatel2106.robocar.things.processor.ThreadManager;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -131,8 +132,7 @@ final class HCSR04Driver implements AutoCloseable {
         try {
             //Prepare the handler
             if (mHandler == null) {
-                mHandlerThread = new HandlerThread(TAG);
-                mHandlerThread.start();
+                mHandlerThread = ThreadManager.getRadarHandlerThread();
                 mHandler = new Handler(mHandlerThread.getLooper());
             }
 
