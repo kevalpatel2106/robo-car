@@ -61,9 +61,7 @@ public final class Controller implements CameraCaptureListener {
     private CompositeDisposable mCompositeDisposable = new CompositeDisposable();
 
     private TensorFlowImageClassifier mTensorFlowImageClassifier;
-    private Handler mSpeechProcessorHandler;
 
-    private SpeechProcessor mSpeechProcessor;
     /**
      * {@link ObstacleAlertListener} to prevent collision with the object using front radar.
      */
@@ -95,11 +93,11 @@ public final class Controller implements CameraCaptureListener {
     public Controller(@NonNull final Context context) {
         mTensorFlowImageClassifier = new TensorFlowImageClassifier(context);
 
-        mSpeechProcessorHandler = ThreadManager.getSpeechHandler();
-        mSpeechProcessorHandler.post(new Runnable() {
+        Handler speechProcessorHandler = ThreadManager.getSpeechHandler();
+        speechProcessorHandler.post(new Runnable() {
             @Override
             public void run() {
-                mSpeechProcessor = new SpeechProcessor(context, Controller.this);
+                new SpeechProcessor(context, Controller.this);
             }
         });
 
