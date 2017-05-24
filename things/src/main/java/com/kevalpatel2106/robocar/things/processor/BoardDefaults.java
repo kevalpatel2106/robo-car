@@ -195,6 +195,15 @@ public final class BoardDefaults {
         }
     }
 
+    public static String getI2CPortForMagnetometer() {
+        switch (getBoardVariant()) {
+            case DEVICE_RPI3:
+                return "BCM2";
+            default:
+                throw new IllegalStateException("Unknown board " + Build.DEVICE);
+        }
+    }
+
     /**
      * Get board variant.
      *

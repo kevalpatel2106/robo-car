@@ -189,7 +189,7 @@ public final class Controller implements CameraCaptureListener {
     @Override
     public void onImageCaptured(@NonNull Bitmap bitmap) {
         mSocketWriter.writeImage(bitmap);
-        processImage(bitmap);
+//        processImage(bitmap);
         captureImage();
     }
 

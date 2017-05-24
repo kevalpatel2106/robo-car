@@ -138,7 +138,7 @@ abstract class ChassisMock {
         /**
          * Mount the magnetometer. This is an optional component.
          */
-        public abstract BuilderMock mountMagnetometer();
+        public abstract BuilderMock mountMagnetometer(Context context);
 
         /**
          * Validate and initialize the components.

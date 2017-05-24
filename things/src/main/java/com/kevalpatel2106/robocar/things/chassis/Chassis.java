@@ -257,9 +257,9 @@ public final class Chassis extends ChassisMock {
         }
 
         @Override
-        public Builder mountMagnetometer() {
+        public Builder mountMagnetometer(Context context) {
             mMagnetoMeter = new MagnetoMeter();
-            mMagnetoMeter.turnOn();
+            mMagnetoMeter.turnOn(context);
             return this;
         }
 

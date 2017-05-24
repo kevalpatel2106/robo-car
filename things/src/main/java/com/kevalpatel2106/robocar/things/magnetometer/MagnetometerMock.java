@@ -16,6 +16,9 @@
 
 package com.kevalpatel2106.robocar.things.magnetometer;
 
+import android.content.Context;
+import android.support.annotation.NonNull;
+
 /**
  * Created by Keval Patel on 17/05/17.
  *
@@ -24,7 +27,7 @@ package com.kevalpatel2106.robocar.things.magnetometer;
 
 abstract class MagnetometerMock {
 
-    public abstract void turnOn();
+    public abstract void turnOn(@NonNull Context context);
 
     public abstract void turnOff();
 }
